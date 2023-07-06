@@ -19,8 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: 'ros-industrial/industrial_ci@master'
-        with:
-          env: ${{matrix.env}}
+      env: ${{matrix.env}}
   husky_humble_main_ci:
     name: Humble Main
     strategy:
@@ -31,5 +30,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: 'ros-industrial/industrial_ci@master'
-        with:
-          env: ${{matrix.env}}
+        env: ${{matrix.env}}

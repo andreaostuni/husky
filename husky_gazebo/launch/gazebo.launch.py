@@ -19,11 +19,11 @@ ARGUMENTS = [
 def generate_launch_description():
 
     gz_resource_path = SetEnvironmentVariable(name='GAZEBO_MODEL_PATH', value=[
-                                                EnvironmentVariable('GAZEBO_MODEL_PATH',
-                                                                    default_value=''),
-                                                '/usr/share/gazebo-11/models/:',
-                                                str(Path(get_package_share_directory('husky_description')).
-                                                    parent.resolve())])
+        EnvironmentVariable('GAZEBO_MODEL_PATH',
+                            default_value=''),
+        '/usr/share/gazebo-11/models/:',
+        str(Path(get_package_share_directory('husky_description')).
+            parent.resolve())])
 
     # Launch args
     world_path = LaunchConfiguration('world_path')
@@ -39,7 +39,8 @@ def generate_launch_description():
             PathJoinSubstitution([FindExecutable(name="xacro")]),
             " ",
             PathJoinSubstitution(
-                [FindPackageShare("husky_description"), "urdf", "husky.urdf.xacro"]
+                [FindPackageShare("husky_description"),
+                 "urdf", "husky.urdf.xacro"]
             ),
             " ",
             "name:=husky",
@@ -113,13 +114,13 @@ def generate_launch_description():
     # Launch husky_control/control.launch.py which is just robot_localization.
     launch_husky_control = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(PathJoinSubstitution(
-        [FindPackageShare("husky_control"), 'launch', 'control.launch.py'])))
+            [FindPackageShare("husky_control"), 'launch', 'control.launch.py'])))
 
     # Launch husky_control/teleop_base.launch.py which is various ways to tele-op
     # the robot but does not include the joystick. Also, has a twist mux.
     launch_husky_teleop_base = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(PathJoinSubstitution(
-        [FindPackageShare("husky_control"), 'launch', 'teleop_base.launch.py'])))
+            [FindPackageShare("husky_control"), 'launch', 'teleop_base.launch.py'])))
 
     ld = LaunchDescription(ARGUMENTS)
     ld.add_action(gz_resource_path)

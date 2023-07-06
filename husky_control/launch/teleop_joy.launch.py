@@ -3,13 +3,14 @@ from launch.substitutions import EnvironmentVariable, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
+
 def generate_launch_description():
     lc = LaunchContext()
     joy_type = EnvironmentVariable('CPR_JOY_TYPE', default_value='logitech')
 
-
     filepath_config_joy = PathJoinSubstitution(
-        [FindPackageShare('husky_control'), 'config', ('teleop_' + joy_type.perform(lc) + '.yaml')]
+        [FindPackageShare('husky_control'), 'config',
+         ('teleop_' + joy_type.perform(lc) + '.yaml')]
     )
 
     node_joy = Node(
@@ -30,9 +31,7 @@ def generate_launch_description():
         parameters=[filepath_config_joy]
     )
 
-
     ld = LaunchDescription()
     ld.add_action(node_joy)
     ld.add_action(node_teleop_twist_joy)
     return ld
-

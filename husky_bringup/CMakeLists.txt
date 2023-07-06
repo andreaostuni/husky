@@ -7,7 +7,7 @@ find_package(ament_cmake REQUIRED)
 install(DIRECTORY config launch udev
   DESTINATION share/${PROJECT_NAME}
 )
-install(PROGRAMS scripts/install 
+install(PROGRAMS scripts/install
   DESTINATION lib/${PROJECT_NAME}
 )
 

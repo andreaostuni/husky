@@ -3,6 +3,7 @@ from launch.substitutions import PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
+
 def generate_launch_description():
 
     filepath_config_twist_mux = PathJoinSubstitution(
@@ -10,9 +11,9 @@ def generate_launch_description():
     )
 
     filepath_config_interactive_markers = PathJoinSubstitution(
-        [FindPackageShare('husky_control'), 'config', 'teleop_interactive_markers.yaml']
+        [FindPackageShare('husky_control'), 'config',
+         'teleop_interactive_markers.yaml']
     )
-
 
     node_interactive_marker_twist_server = Node(
         package='interactive_marker_twist_server',
@@ -27,7 +28,8 @@ def generate_launch_description():
         package='twist_mux',
         executable='twist_mux',
         output='screen',
-        remappings={('/cmd_vel_out', '/husky_velocity_controller/cmd_vel_unstamped')},
+        remappings={
+            ('/cmd_vel_out', '/husky_velocity_controller/cmd_vel_unstamped')},
         parameters=[filepath_config_twist_mux]
     )
 
@@ -35,4 +37,3 @@ def generate_launch_description():
     ld.add_action(node_interactive_marker_twist_server)
     ld.add_action(node_twist_mux)
     return ld
-

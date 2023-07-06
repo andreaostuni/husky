@@ -4,8 +4,6 @@ from launch.substitutions import Command, FindExecutable, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
-import xacro
-
 
 def generate_launch_description():
 
@@ -15,7 +13,8 @@ def generate_launch_description():
             PathJoinSubstitution([FindExecutable(name="xacro")]),
             " ",
             PathJoinSubstitution(
-                [FindPackageShare("husky_description"), "urdf", "husky.urdf.xacro"]
+                [FindPackageShare("husky_description"),
+                 "urdf", "husky.urdf.xacro"]
             ),
         ]
     )

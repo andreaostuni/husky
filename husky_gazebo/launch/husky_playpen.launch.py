@@ -6,17 +6,17 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
-    
+
     world_file = PathJoinSubstitution(
         [FindPackageShare("husky_gazebo"),
-        "worlds",
-        "clearpath_playpen.world"],
+         "worlds",
+         "clearpath_playpen.world"],
     )
 
     gazebo_launch = PathJoinSubstitution(
         [FindPackageShare("husky_gazebo"),
-        "launch",
-        "gazebo.launch.py"],
+         "launch",
+         "gazebo.launch.py"],
     )
 
     gazebo_sim = IncludeLaunchDescription(
