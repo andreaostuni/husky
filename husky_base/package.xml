@@ -3,13 +3,13 @@
   <name>husky_base</name>
   <version>1.0.9</version>
   <description>Clearpath Husky robot driver</description>
-
-  <author email="mpurvis@clearpathrobotics.com">Mike Purvis</author>
-  <author email="paul@bovbel.com">Paul Bovbel</author>
-
   <maintainer email="tbaltovski@clearpathrobotics.com">Tony Baltovski</maintainer>
 
   <license>BSD</license>
+  <author email="mpurvis@clearpathrobotics.com">Mike Purvis</author>
+  <author email="paul@bovbel.com">Paul Bovbel</author>
+
+
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
