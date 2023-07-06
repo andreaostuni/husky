@@ -8,8 +8,8 @@ assignees: tonybaltovski
 ---
 
 **Please provide the following information:**
- - OS: (e.g. Ubuntu 18.04)
- - ROS Distro: (e.g. Melodic)
+ - OS: (e.g. Ubuntu 22.04)
+ - ROS Distro: (e.g. Humble)
  - Built from source or installed:
  - Package version: (if from repository, give version from `sudo dpkg -s ros-$ROS_VERSION-husky-PACKAGE_WITH_ISSUE`, if from source, give commit hash)
  - Real hardware or simulation:
