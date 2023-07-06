@@ -2,8 +2,9 @@ name: husky_ci
 
 on: 
   push:
-    braches: [humble-devel]
-    pull_request: [humble-devel]
+    branches: [humble-devel]
+  pull_request: 
+    branches: [humble-devel]
   schedule:
     - cron: '0 4 * * *' # every day at 4 AM (UTC)
 
