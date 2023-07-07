@@ -246,7 +246,7 @@ void HuskyHardware::readStatusFromHardware()
   {
     RCLCPP_ERROR(rclcpp::get_logger(HW_NAME), "Could not get system_status");
   }
-
+  diagnostic_updater_->force_update();
   status_node_->publish_status(status_msg_);
 }
 
@@ -286,6 +286,18 @@ hardware_interface::CallbackReturn HuskyHardware::on_init(const hardware_interfa
   serial_port_ = info_.hardware_parameters["serial_port"];
 
   status_node_ = std::make_shared<husky_status::HuskyStatus>();
+
+  diagnostic_updater_ = std::make_unique<diagnostic_updater::Updater>(status_node_, 10.0);
+  system_status_task_ = std::make_unique<husky_base::HuskyHardwareSystemDiagnosticTask>(status_msg_);
+  power_status_task_ = std::make_unique<husky_base::HuskyHardwarePowerDiagnosticTask>(status_msg_);
+  safety_status_task_ = std::make_unique<husky_base::HuskyHardwareSafetyDiagnosticTask>(status_msg_);
+  software_status_task_ = std::make_unique<husky_base::HuskySoftwareDiagnosticTask>(status_msg_, 10.0);
+
+  diagnostic_updater_->setHardwareID("Husky A-200");
+  diagnostic_updater_->add(*system_status_task_);
+  diagnostic_updater_->add(*power_status_task_);
+  diagnostic_updater_->add(*safety_status_task_);
+  diagnostic_updater_->add(*software_status_task_);
 
   RCLCPP_INFO(rclcpp::get_logger(HW_NAME), "Port: %s", serial_port_.c_str());
   horizon_legacy::connect(serial_port_);

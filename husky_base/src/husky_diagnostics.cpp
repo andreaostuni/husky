@@ -29,7 +29,7 @@
  *
  */
 
-#include "husky_base/husky_diagnostics.h"
+#include "husky_base/husky_diagnostics.hpp"
 
 namespace
 {
@@ -57,32 +57,13 @@ const unsigned int SAFETY_ERROR = (SAFETY_LOCKOUT | SAFETY_ESTOP | SAFETY_CURREN
 namespace husky_base
 {
 
-template <>
-HuskyHardwareDiagnosticTask<clearpath::DataSystemStatus>::HuskyHardwareDiagnosticTask(husky_msgs::HuskyStatus& msg)
+HuskyHardwareSystemDiagnosticTask::HuskyHardwareSystemDiagnosticTask(husky_msgs::msg::HuskyStatus& msg)
   : DiagnosticTask("system_status"), msg_(msg)
 {
 }
 
-template <>
-void HuskyHardwareDiagnosticTask<clearpath::DataSystemStatus>::update(
-    diagnostic_updater::DiagnosticStatusWrapper& stat,
-    horizon_legacy::Channel<clearpath::DataSystemStatus>::Ptr& system_status)
+void HuskyHardwareSystemDiagnosticTask::run(diagnostic_updater::DiagnosticStatusWrapper& stat)
 {
-  msg_.uptime = system_status->getUptime();
-
-  msg_.battery_voltage = system_status->getVoltage(0);
-  msg_.left_driver_voltage = system_status->getVoltage(1);
-  msg_.right_driver_voltage = system_status->getVoltage(2);
-
-  msg_.mcu_and_user_port_current = system_status->getCurrent(0);
-  msg_.left_driver_current = system_status->getCurrent(1);
-  msg_.right_driver_current = system_status->getCurrent(2);
-
-  msg_.left_driver_temp = system_status->getTemperature(0);
-  msg_.right_driver_temp = system_status->getTemperature(1);
-  msg_.left_motor_temp = system_status->getTemperature(2);
-  msg_.right_motor_temp = system_status->getTemperature(3);
-
   stat.add("Uptime", msg_.uptime);
 
   stat.add("Battery Voltage", msg_.battery_voltage);
@@ -98,102 +79,81 @@ void HuskyHardwareDiagnosticTask<clearpath::DataSystemStatus>::update(
   stat.add("Left Motor Temp (C)", msg_.left_motor_temp);
   stat.add("Right Motor Temp (C)", msg_.right_motor_temp);
 
-  stat.summary(diagnostic_msgs::DiagnosticStatus::OK, "System Status OK");
+  stat.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, "System Status OK");
   if (msg_.battery_voltage > OVERVOLT_ERROR)
   {
-    stat.mergeSummary(diagnostic_msgs::DiagnosticStatus::ERROR, "Main battery voltage too high");
+    stat.mergeSummary(diagnostic_msgs::msg::DiagnosticStatus::ERROR, "Main battery voltage too high");
   }
   else if (msg_.battery_voltage > OVERVOLT_WARN)
   {
-    stat.mergeSummary(diagnostic_msgs::DiagnosticStatus::WARN, "Main battery voltage too high");
+    stat.mergeSummary(diagnostic_msgs::msg::DiagnosticStatus::WARN, "Main battery voltage too high");
   }
   else if (msg_.battery_voltage < UNDERVOLT_ERROR)
   {
-    stat.mergeSummary(diagnostic_msgs::DiagnosticStatus::ERROR, "Main battery voltage too low");
+    stat.mergeSummary(diagnostic_msgs::msg::DiagnosticStatus::ERROR, "Main battery voltage too low");
   }
   else if (msg_.battery_voltage < UNDERVOLT_WARN)
   {
-    stat.mergeSummary(diagnostic_msgs::DiagnosticStatus::WARN, "Main battery voltage too low");
+    stat.mergeSummary(diagnostic_msgs::msg::DiagnosticStatus::WARN, "Main battery voltage too low");
   }
   else
   {
-    stat.mergeSummary(diagnostic_msgs::DiagnosticStatus::OK, "Voltage OK");
+    stat.mergeSummary(diagnostic_msgs::msg::DiagnosticStatus::OK, "Voltage OK");
   }
 
   if (std::max(msg_.left_driver_temp, msg_.right_driver_temp) > DRIVER_OVERTEMP_ERROR)
   {
-    stat.mergeSummary(diagnostic_msgs::DiagnosticStatus::ERROR, "Motor drivers too hot");
+    stat.mergeSummary(diagnostic_msgs::msg::DiagnosticStatus::ERROR, "Motor drivers too hot");
   }
   else if (std::max(msg_.left_driver_temp, msg_.right_driver_temp) > DRIVER_OVERTEMP_WARN)
   {
-    stat.mergeSummary(diagnostic_msgs::DiagnosticStatus::WARN, "Motor drivers too hot");
+    stat.mergeSummary(diagnostic_msgs::msg::DiagnosticStatus::WARN, "Motor drivers too hot");
   }
   else if (std::max(msg_.left_motor_temp, msg_.right_motor_temp) > MOTOR_OVERTEMP_ERROR)
   {
-    stat.mergeSummary(diagnostic_msgs::DiagnosticStatus::ERROR, "Motors too hot");
+    stat.mergeSummary(diagnostic_msgs::msg::DiagnosticStatus::ERROR, "Motors too hot");
   }
   else if (std::max(msg_.left_motor_temp, msg_.right_motor_temp) > MOTOR_OVERTEMP_WARN)
   {
-    stat.mergeSummary(diagnostic_msgs::DiagnosticStatus::WARN, "Motors too hot");
+    stat.mergeSummary(diagnostic_msgs::msg::DiagnosticStatus::WARN, "Motors too hot");
   }
   else
   {
-    stat.mergeSummary(diagnostic_msgs::DiagnosticStatus::OK, "Temperature OK");
+    stat.mergeSummary(diagnostic_msgs::msg::DiagnosticStatus::OK, "Temperature OK");
   }
 }
 
-template <>
-HuskyHardwareDiagnosticTask<clearpath::DataPowerSystem>::HuskyHardwareDiagnosticTask(husky_msgs::HuskyStatus& msg)
+HuskyHardwarePowerDiagnosticTask::HuskyHardwarePowerDiagnosticTask(husky_msgs::msg::HuskyStatus& msg)
   : DiagnosticTask("power_status"), msg_(msg)
 {
 }
 
-template <>
-void HuskyHardwareDiagnosticTask<clearpath::DataPowerSystem>::update(
-    diagnostic_updater::DiagnosticStatusWrapper& stat,
-    horizon_legacy::Channel<clearpath::DataPowerSystem>::Ptr& power_status)
+void HuskyHardwarePowerDiagnosticTask::run(diagnostic_updater::DiagnosticStatusWrapper& stat)
 {
-  msg_.charge_estimate = power_status->getChargeEstimate(0);
-  msg_.capacity_estimate = power_status->getCapacityEstimate(0);
-
   stat.add("Charge (%)", msg_.charge_estimate);
   stat.add("Battery Capacity (Wh)", msg_.capacity_estimate);
 
-  stat.summary(diagnostic_msgs::DiagnosticStatus::OK, "Power System OK");
+  stat.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, "Power System OK");
   if (msg_.charge_estimate < LOWPOWER_ERROR)
   {
-    stat.mergeSummary(diagnostic_msgs::DiagnosticStatus::ERROR, "Low power");
+    stat.mergeSummary(diagnostic_msgs::msg::DiagnosticStatus::ERROR, "Low power");
   }
   else if (msg_.charge_estimate < LOWPOWER_WARN)
   {
-    stat.mergeSummary(diagnostic_msgs::DiagnosticStatus::WARN, "Low power");
+    stat.mergeSummary(diagnostic_msgs::msg::DiagnosticStatus::WARN, "Low power");
   }
   else
   {
-    stat.mergeSummary(diagnostic_msgs::DiagnosticStatus::OK, "Charge OK");
+    stat.mergeSummary(diagnostic_msgs::msg::DiagnosticStatus::OK, "Charge OK");
   }
 }
-
-template <>
-HuskyHardwareDiagnosticTask<clearpath::DataSafetySystemStatus>::HuskyHardwareDiagnosticTask(
-    husky_msgs::HuskyStatus& msg)
+HuskyHardwareSafetyDiagnosticTask::HuskyHardwareSafetyDiagnosticTask(husky_msgs::msg::HuskyStatus& msg)
   : DiagnosticTask("safety_status"), msg_(msg)
 {
 }
 
-template <>
-void HuskyHardwareDiagnosticTask<clearpath::DataSafetySystemStatus>::update(
-    diagnostic_updater::DiagnosticStatusWrapper& stat,
-    horizon_legacy::Channel<clearpath::DataSafetySystemStatus>::Ptr& safety_status)
+void HuskyHardwareSafetyDiagnosticTask::run(diagnostic_updater::DiagnosticStatusWrapper& stat)
 {
-  uint16_t flags = safety_status->getFlags();
-  msg_.timeout = (flags & SAFETY_TIMEOUT) > 0;
-  msg_.lockout = (flags & SAFETY_LOCKOUT) > 0;
-  msg_.e_stop = (flags & SAFETY_ESTOP) > 0;
-  msg_.ros_pause = (flags & SAFETY_CCI) > 0;
-  msg_.no_battery = (flags & SAFETY_PSU) > 0;
-  msg_.current_limit = (flags & SAFETY_CURRENT) > 0;
-
   stat.add("Timeout", static_cast<bool>(msg_.timeout));
   stat.add("Lockout", static_cast<bool>(msg_.lockout));
   stat.add("Emergency Stop", static_cast<bool>(msg_.e_stop));
@@ -201,18 +161,18 @@ void HuskyHardwareDiagnosticTask<clearpath::DataSafetySystemStatus>::update(
   stat.add("No battery", static_cast<bool>(msg_.no_battery));
   stat.add("Current limit", static_cast<bool>(msg_.current_limit));
 
-  stat.summary(diagnostic_msgs::DiagnosticStatus::OK, "Safety System OK");
-  if ((flags & SAFETY_ERROR) > 0)
+  stat.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, "Safety System OK");
+  if (msg_.lockout || msg_.e_stop || msg_.current_limit)
   {
-    stat.mergeSummary(diagnostic_msgs::DiagnosticStatus::ERROR, "Safety System Error");
+    stat.mergeSummary(diagnostic_msgs::msg::DiagnosticStatus::ERROR, "Safety System Error");
   }
-  else if ((flags & SAFETY_WARN) > 0)
+  else if (msg_.timeout || msg_.ros_pause || msg_.no_battery)
   {
-    stat.mergeSummary(diagnostic_msgs::DiagnosticStatus::WARN, "Safety System Warning");
+    stat.mergeSummary(diagnostic_msgs::msg::DiagnosticStatus::WARN, "Safety System Warning");
   }
 }
 
-HuskySoftwareDiagnosticTask::HuskySoftwareDiagnosticTask(husky_msgs::HuskyStatus& msg, double target_control_freq)
+HuskySoftwareDiagnosticTask::HuskySoftwareDiagnosticTask(husky_msgs::msg::HuskyStatus& msg, double target_control_freq)
   : DiagnosticTask("software_status"), msg_(msg), target_control_freq_(target_control_freq)
 {
   reset();
@@ -231,12 +191,12 @@ void HuskySoftwareDiagnosticTask::run(diagnostic_updater::DiagnosticStatusWrappe
 
   double margin = control_freq_ / target_control_freq_ * 100;
 
-  stat.summary(diagnostic_msgs::DiagnosticStatus::OK, "Software OK");
+  stat.summary(diagnostic_msgs::msg::DiagnosticStatus::OK, "Software OK");
   if (margin < CONTROLFREQ_WARN)
   {
     std::ostringstream message;
     message << "Control loop executing " << 100 - static_cast<int>(margin) << "% slower than desired";
-    stat.mergeSummary(diagnostic_msgs::DiagnosticStatus::WARN, message.str());
+    stat.mergeSummary(diagnostic_msgs::msg::DiagnosticStatus::WARN, message.str());
   }
 
   reset();

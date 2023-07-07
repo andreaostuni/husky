@@ -27,6 +27,7 @@ find_package(std_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_ros REQUIRED)
+find_package(diagnostic_updater REQUIRED)
 
 
 ## COMPILE
@@ -35,6 +36,7 @@ add_library(
   SHARED
   src/husky_hardware.cpp
   src/husky_status.cpp
+  src/husky_diagnostics.cpp
   src/horizon_legacy_wrapper.cpp
   src/horizon_legacy/crc.cpp
   src/horizon_legacy/Logger.cpp
@@ -59,6 +61,7 @@ ament_target_dependencies(
   hardware_interface
   pluginlib
   rclcpp
+  diagnostic_updater
 )
 
 
@@ -75,7 +78,7 @@ install(
   DESTINATION include
 )
 
-install(DIRECTORY launch
+install(DIRECTORY launch config
   DESTINATION share/${PROJECT_NAME}
 )
 

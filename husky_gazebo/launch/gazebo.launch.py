@@ -1,7 +1,9 @@
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription, RegisterEventHandler, SetEnvironmentVariable
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, \
+    IncludeLaunchDescription, RegisterEventHandler, SetEnvironmentVariable
 from launch.event_handlers import OnProcessExit
-from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.launch_description_sources \
+    import PythonLaunchDescriptionSource
 from launch.substitutions import Command, EnvironmentVariable, FindExecutable, LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
@@ -27,7 +29,6 @@ def generate_launch_description():
 
     # Launch args
     world_path = LaunchConfiguration('world_path')
-    prefix = LaunchConfiguration('prefix')
 
     config_husky_velocity_controller = PathJoinSubstitution(
         [FindPackageShare("husky_control"), "config", "control.yaml"]

@@ -29,13 +29,12 @@
  *
  */
 
-#ifndef HUSKY_BASE_HUSKY_DIAGNOSTICS_H
-#define HUSKY_BASE_HUSKY_DIAGNOSTICS_H
+#ifndef HUSKY_BASE_HUSKY_DIAGNOSTICS_HPP
+#define HUSKY_BASE_HUSKY_DIAGNOSTICS_HPP
 
-#include "ros/ros.h"
-#include "diagnostic_updater/diagnostic_updater.h"
-#include "husky_base/horizon_legacy_wrapper.h"
-#include "husky_msgs/HuskyStatus.h"
+#include "rclcpp/rclcpp.hpp"
+#include "diagnostic_updater/diagnostic_updater.hpp"
+#include "husky_msgs/msg/husky_status.hpp"
 
 namespace husky_base
 {
@@ -43,7 +42,7 @@ namespace husky_base
 class HuskySoftwareDiagnosticTask : public diagnostic_updater::DiagnosticTask
 {
 public:
-  explicit HuskySoftwareDiagnosticTask(husky_msgs::HuskyStatus& msg, double target_control_freq);
+  explicit HuskySoftwareDiagnosticTask(husky_msgs::msg::HuskyStatus& msg, double target_control_freq);
 
   void run(diagnostic_updater::DiagnosticStatusWrapper& stat);
 
@@ -52,55 +51,40 @@ public:
 private:
   void reset();
 
+  husky_msgs::msg::HuskyStatus& msg_;
   double control_freq_, target_control_freq_;
-  husky_msgs::HuskyStatus& msg_;
 };
 
-template <typename T>
-class HuskyHardwareDiagnosticTask : public diagnostic_updater::DiagnosticTask
+class HuskyHardwareSystemDiagnosticTask : public diagnostic_updater::DiagnosticTask
 {
 public:
-  explicit HuskyHardwareDiagnosticTask(husky_msgs::HuskyStatus& msg);
+  explicit HuskyHardwareSystemDiagnosticTask(husky_msgs::msg::HuskyStatus& msg);
 
-  void run(diagnostic_updater::DiagnosticStatusWrapper& stat)
-  {
-    typename horizon_legacy::Channel<T>::Ptr latest = horizon_legacy::Channel<T>::requestData(1.0);
-    if (latest)
-    {
-      update(stat, latest);
-    }
-  }
-
-  void update(diagnostic_updater::DiagnosticStatusWrapper& stat, typename horizon_legacy::Channel<T>::Ptr& status);
+  void run(diagnostic_updater::DiagnosticStatusWrapper& stat);
 
 private:
-  husky_msgs::HuskyStatus& msg_;
+  husky_msgs::msg::HuskyStatus& msg_;
 };
 
-template <>
-HuskyHardwareDiagnosticTask<clearpath::DataSystemStatus>::HuskyHardwareDiagnosticTask(husky_msgs::HuskyStatus& msg);
+class HuskyHardwarePowerDiagnosticTask : public diagnostic_updater::DiagnosticTask
+{
+public:
+  explicit HuskyHardwarePowerDiagnosticTask(husky_msgs::msg::HuskyStatus& msg);
+  void run(diagnostic_updater::DiagnosticStatusWrapper& stat);
 
-template <>
-HuskyHardwareDiagnosticTask<clearpath::DataPowerSystem>::HuskyHardwareDiagnosticTask(husky_msgs::HuskyStatus& msg);
+private:
+  husky_msgs::msg::HuskyStatus& msg_;
+};
 
-template <>
-HuskyHardwareDiagnosticTask<clearpath::DataSafetySystemStatus>::HuskyHardwareDiagnosticTask(
-    husky_msgs::HuskyStatus& msg);
+class HuskyHardwareSafetyDiagnosticTask : public diagnostic_updater::DiagnosticTask
+{
+public:
+  explicit HuskyHardwareSafetyDiagnosticTask(husky_msgs::msg::HuskyStatus& msg);
+  void run(diagnostic_updater::DiagnosticStatusWrapper& stat);
 
-template <>
-void HuskyHardwareDiagnosticTask<clearpath::DataSystemStatus>::update(
-    diagnostic_updater::DiagnosticStatusWrapper& stat,
-    horizon_legacy::Channel<clearpath::DataSystemStatus>::Ptr& status);
-
-template <>
-void HuskyHardwareDiagnosticTask<clearpath::DataPowerSystem>::update(
-    diagnostic_updater::DiagnosticStatusWrapper& stat,
-    horizon_legacy::Channel<clearpath::DataPowerSystem>::Ptr& status);
-
-template <>
-void HuskyHardwareDiagnosticTask<clearpath::DataSafetySystemStatus>::update(
-    diagnostic_updater::DiagnosticStatusWrapper& stat,
-    horizon_legacy::Channel<clearpath::DataSafetySystemStatus>::Ptr& status);
+private:
+  husky_msgs::msg::HuskyStatus& msg_;
+};
 
 }  // namespace husky_base
 #endif  // HUSKY_BASE_HUSKY_DIAGNOSTICS_H

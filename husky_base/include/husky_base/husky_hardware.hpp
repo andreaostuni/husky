@@ -14,6 +14,7 @@
 #include "husky_msgs/msg/husky_status.hpp"
 #include "rclcpp/macros.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "husky_base/husky_diagnostics.hpp"
 
 #include "husky_base/horizon_legacy_wrapper.h"
 #include "husky_base/husky_status.hpp"
@@ -71,6 +72,12 @@ private:
 
   std::shared_ptr<husky_status::HuskyStatus> status_node_;
   husky_msgs::msg::HuskyStatus status_msg_;
+
+  std::unique_ptr<diagnostic_updater::Updater> diagnostic_updater_;
+  std::unique_ptr<husky_base::HuskyHardwareSystemDiagnosticTask> system_status_task_;
+  std::unique_ptr<husky_base::HuskyHardwarePowerDiagnosticTask> power_status_task_;
+  std::unique_ptr<husky_base::HuskyHardwareSafetyDiagnosticTask> safety_status_task_;
+  std::unique_ptr<husky_base::HuskySoftwareDiagnosticTask> software_status_task_;
 };
 
 }  // namespace husky_base

@@ -13,21 +13,26 @@ jobs:
     name: Humble Testing
     strategy:
       matrix:
-        env:
-          - {ROS_DISTRO: humble, ROS_REPO: testing}
+        distro: [humble]
+        repo: [testing]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: 'ros-industrial/industrial_ci@master'
-      env: ${{matrix.env}}
+        env: 
+          ROS_DISTRO: ${{matrix.distro}}
+          ROS_REPO: ${{matrix.repo}}
   husky_humble_main_ci:
     name: Humble Main
     strategy:
       matrix:
-        env:
-          - {ROS_DISTRO: humble, ROS_REPO: main}
+        distro: [humble]
+        repo: [main]    
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: 'ros-industrial/industrial_ci@master'
-        env: ${{matrix.env}}
+        env: 
+          ROS_DISTRO: ${{matrix.distro}}
+          ROS_REPO: ${{matrix.repo}}
+          
