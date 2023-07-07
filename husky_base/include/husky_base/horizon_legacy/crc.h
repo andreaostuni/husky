@@ -55,6 +55,6 @@
 /*        - the initial value of the register to be used in the calculation  */
 /*        - a pointer to the first element of said character array           */
 /*Outputs: the crc as an unsigned short int                                  */
-uint16_t crc16(int size, int init_val, uint8_t* data);
+uint16_t crc16(int size, int init_val, uint8_t * data);
 
 #endif

@@ -58,13 +58,9 @@ private:
   static long total_sent;
 
 public:
-  CmdMessage() : Message()
-  {
-  }
+  CmdMessage() : Message() {}
 
-  CmdMessage(const CmdMessage& other) : Message(other)
-  {
-  }
+  CmdMessage(const CmdMessage & other) : Message(other) {}
 
   virtual ~CmdMessage();
 };
@@ -74,22 +70,18 @@ class CmdProcessorReset : public CmdMessage
 public:
   CmdProcessorReset();
 
-  CmdProcessorReset(const CmdProcessorReset& other);
+  CmdProcessorReset(const CmdProcessorReset & other);
 };
 
 class CmdRestoreSettings : public CmdMessage
 {
 public:
-  enum restoreFlags
-  {
-    USER_SETTINGS = 0x1,
-    FACTORY_SETTINGS = 0x2
-  };
+  enum restoreFlags { USER_SETTINGS = 0x1, FACTORY_SETTINGS = 0x2 };
 
 public:
   CmdRestoreSettings(enum restoreFlags flags);
 
-  CmdRestoreSettings(const CmdRestoreSettings& other);
+  CmdRestoreSettings(const CmdRestoreSettings & other);
 };
 
 class CmdStoreSettings : public CmdMessage
@@ -97,31 +89,24 @@ class CmdStoreSettings : public CmdMessage
 public:
   CmdStoreSettings();
 
-  CmdStoreSettings(const CmdStoreSettings& other);
+  CmdStoreSettings(const CmdStoreSettings & other);
 };
 
 class SetAckermannOutput : public CmdMessage
 {
 public:
-  enum payloadOffsets
-  {
-    STEERING = 0,
-    THROTTLE = 2,
-    BRAKE = 4,
-    PAYLOAD_LEN = 6
-  };
+  enum payloadOffsets { STEERING = 0, THROTTLE = 2, BRAKE = 4, PAYLOAD_LEN = 6 };
 
 public:
   SetAckermannOutput(double steering, double throt, double brake);
 
-  SetAckermannOutput(const SetAckermannOutput& other);
+  SetAckermannOutput(const SetAckermannOutput & other);
 };
 
 class SetDifferentialControl : public CmdMessage
 {
 public:
-  enum payloadOffsets
-  {
+  enum payloadOffsets {
     LEFT_P = 0,
     LEFT_I = 2,
     LEFT_D = 4,
@@ -140,34 +125,29 @@ public:
 public:
   SetDifferentialControl(double p, double i, double d, double feedfwd, double stic, double int_lim);
 
-  SetDifferentialControl(double left_p, double left_i, double left_d, double left_feedfwd, double left_stic,
-                         double left_int_lim, double right_p, double right_i, double right_d, double right_feedfwd,
-                         double right_stic, double right_int_lim);
+  SetDifferentialControl(
+    double left_p, double left_i, double left_d, double left_feedfwd, double left_stic,
+    double left_int_lim, double right_p, double right_i, double right_d, double right_feedfwd,
+    double right_stic, double right_int_lim);
 
-  SetDifferentialControl(const SetDifferentialControl& other);
+  SetDifferentialControl(const SetDifferentialControl & other);
 };
 
 class SetDifferentialOutput : public CmdMessage
 {
 public:
-  enum payloadOffsets
-  {
-    LEFT = 0,
-    RIGHT = 2,
-    PAYLOAD_LEN = 4
-  };
+  enum payloadOffsets { LEFT = 0, RIGHT = 2, PAYLOAD_LEN = 4 };
 
 public:
   SetDifferentialOutput(double left, double right);
 
-  SetDifferentialOutput(const SetDifferentialOutput& other);
+  SetDifferentialOutput(const SetDifferentialOutput & other);
 };
 
 class SetDifferentialSpeed : public CmdMessage
 {
 public:
-  enum payloadOffsets
-  {
+  enum payloadOffsets {
     LEFT_SPEED = 0,
     RIGHT_SPEED = 2,
     LEFT_ACCEL = 4,
@@ -178,7 +158,7 @@ public:
 public:
   SetDifferentialSpeed(double left_spd, double right_speed, double left_accel, double right_accel);
 
-  SetDifferentialSpeed(const SetDifferentialSpeed& other);
+  SetDifferentialSpeed(const SetDifferentialSpeed & other);
 };
 
 class SetGear : public CmdMessage
@@ -186,47 +166,37 @@ class SetGear : public CmdMessage
 public:
   SetGear(uint8_t gear);
 
-  SetGear(const SetGear& other);
+  SetGear(const SetGear & other);
 };
 
 class SetMaxAccel : public CmdMessage
 {
 public:
-  enum payloadOffsets
-  {
-    MAX_FWD = 0,
-    MAX_REV = 2,
-    PAYLOAD_LEN = 4
-  };
+  enum payloadOffsets { MAX_FWD = 0, MAX_REV = 2, PAYLOAD_LEN = 4 };
 
 public:
   SetMaxAccel(double max_fwd, double max_rev);
 
-  SetMaxAccel(const SetMaxAccel& other);
+  SetMaxAccel(const SetMaxAccel & other);
 };
 
 class SetMaxSpeed : public CmdMessage
 {
 public:
-  enum payloadOffsets
-  {
-    MAX_FWD = 0,
-    MAX_REV = 2,
-    PAYLOAD_LEN = 4
-  };
+  enum payloadOffsets { MAX_FWD = 0, MAX_REV = 2, PAYLOAD_LEN = 4 };
 
 public:
   SetMaxSpeed(double max_fwd, double max_rev);
 
-  SetMaxSpeed(const SetMaxSpeed& other);
+  SetMaxSpeed(const SetMaxSpeed & other);
 };
 
 class SetPlatformName : public CmdMessage
 {
 public:
-  SetPlatformName(const char* name);
+  SetPlatformName(const char * name);
 
-  SetPlatformName(const SetPlatformName& other);
+  SetPlatformName(const SetPlatformName & other);
 };
 
 class SetPlatformTime : public CmdMessage
@@ -234,7 +204,7 @@ class SetPlatformTime : public CmdMessage
 public:
   SetPlatformTime(uint32_t time);
 
-  SetPlatformTime(const SetPlatformTime& other);
+  SetPlatformTime(const SetPlatformTime & other);
 };
 
 class SetSafetySystem : public CmdMessage
@@ -242,41 +212,29 @@ class SetSafetySystem : public CmdMessage
 public:
   SetSafetySystem(uint16_t flags);
 
-  SetSafetySystem(const SetSafetySystem& other);
+  SetSafetySystem(const SetSafetySystem & other);
 };
 
 class SetTurn : public CmdMessage
 {
 public:
-  enum payloadOffsets
-  {
-    TRANSLATIONAL = 0,
-    TURN_RADIUS = 2,
-    TRANS_ACCEL = 4,
-    PAYLOAD_LEN = 6
-  };
+  enum payloadOffsets { TRANSLATIONAL = 0, TURN_RADIUS = 2, TRANS_ACCEL = 4, PAYLOAD_LEN = 6 };
 
 public:
   SetTurn(double trans, double rad, double accel);
 
-  SetTurn(const SetTurn& other);
+  SetTurn(const SetTurn & other);
 };
 
 class SetVelocity : public CmdMessage
 {
 public:
-  enum payloadOffsets
-  {
-    TRANSLATIONAL = 0,
-    ROTATIONAL = 2,
-    TRANS_ACCEL = 4,
-    PAYLOAD_LEN = 6
-  };
+  enum payloadOffsets { TRANSLATIONAL = 0, ROTATIONAL = 2, TRANS_ACCEL = 4, PAYLOAD_LEN = 6 };
 
 public:
   SetVelocity(double trans, double rot, double accel);
 
-  SetVelocity(const SetVelocity& other);
+  SetVelocity(const SetVelocity & other);
 };
 
 }  // namespace clearpath

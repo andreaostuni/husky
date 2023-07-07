@@ -34,8 +34,8 @@
 
 #include <iostream>
 #include <memory>
-#include <type_traits>
 #include <string>
+#include <type_traits>
 
 #include "husky_base/horizon_legacy/clearpath.h"
 
@@ -60,17 +60,17 @@ struct Channel
 {
   typedef std::shared_ptr<T> Ptr;
   typedef std::shared_ptr<const T> ConstPtr;
-  static_assert((std::is_base_of<clearpath::Message, T>::value), "T must be a descendant of clearpath::Message");
+  static_assert(
+    (std::is_base_of<clearpath::Message, T>::value),
+    "T must be a descendant of clearpath::Message");
 
   static Ptr getLatest(double timeout)
   {
-    T* latest = 0;
+    T * latest = 0;
 
     // Iterate over all messages in queue and find the latest
-    while (T* next = T::popNext())
-    {
-      if (latest)
-      {
+    while (T * next = T::popNext()) {
+      if (latest) {
         delete latest;
         latest = 0;
       }
@@ -78,14 +78,12 @@ struct Channel
     }
 
     // If no messages found in queue, then poll for timeout until one is received
-    if (!latest)
-    {
+    if (!latest) {
       latest = T::waitNext(timeout);
     }
 
     // If no messages received within timeout, make a request
-    if (!latest)
-    {
+    if (!latest) {
       return requestData(timeout);
     }
 
@@ -94,27 +92,19 @@ struct Channel
 
   static Ptr requestData(double timeout)
   {
-    T* update = 0;
-    while (!update)
-    {
+    T * update = 0;
+    while (!update) {
       update = T::getUpdate(timeout);
-      if (!update)
-      {
+      if (!update) {
         reconnect();
       }
     }
     return Ptr(update);
   }
 
-  static void subscribe(double frequency)
-  {
-    T::subscribe(frequency);
-  }
+  static void subscribe(double frequency) { T::subscribe(frequency); }
 
-  static void unsubscribe()
-  {
-    T::subscribe(UNSUBSCRIBE);
-  }
+  static void unsubscribe() { T::subscribe(UNSUBSCRIBE); }
 };
 
 }  // namespace horizon_legacy

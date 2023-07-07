@@ -47,9 +47,10 @@
 #ifndef CLEARPATH_MESSAGE_H
 #define CLEARPATH_MESSAGE_H
 
-#include <iostream>
-#include <cstdlib>
 #include <stdint.h>
+
+#include <cstdlib>
+#include <iostream>
 
 #include "husky_base/horizon_legacy/Exception.h"
 
@@ -59,16 +60,12 @@ namespace clearpath
 class MessageException : public Exception
 {
 public:
-  enum errors
-  {
-    ERROR_BASE = 0,
-    INVALID_LENGTH
-  };
+  enum errors { ERROR_BASE = 0, INVALID_LENGTH };
 
 public:
   enum errors type;
 
-  MessageException(const char* msg, enum errors ex_type = ERROR_BASE);
+  MessageException(const char * msg, enum errors ex_type = ERROR_BASE);
 };
 
 class Message
@@ -83,8 +80,7 @@ protected:
   static const size_t HEADER_LENGTH = 12;
 
   // Offsets of fields within data
-  enum dataOffsets
-  {
+  enum dataOffsets {
     SOH_OFST = 0,
     LENGTH_OFST,
     LENGTH_COMP_OFST,
@@ -112,10 +108,7 @@ public:
   static const uint8_t STX = 0x55;
 
 protected:
-  size_t crcOffset()
-  {
-    return total_len - CRC_LENGTH;
-  };
+  size_t crcOffset() { return total_len - CRC_LENGTH; };
 
   void setLength(uint8_t len);
 
@@ -127,9 +120,9 @@ protected:
 
   void setType(uint16_t type);
 
-  uint8_t* getPayloadPointer(size_t offset = 0);
+  uint8_t * getPayloadPointer(size_t offset = 0);
 
-  void setPayload(void* buf, size_t buf_size);
+  void setPayload(void * buf, size_t buf_size);
 
   void setPayloadLength(uint8_t len);
 
@@ -138,12 +131,13 @@ protected:
 public:
   Message();
 
-  Message(void* input, size_t msg_len);
+  Message(void * input, size_t msg_len);
 
-  Message(const Message& other);
+  Message(const Message & other);
 
-  Message(uint16_t type, uint8_t* payload, size_t payload_len, uint32_t timestamp = 0, uint8_t flags = 0,
-          uint8_t version = 0);
+  Message(
+    uint16_t type, uint8_t * payload, size_t payload_len, uint32_t timestamp = 0, uint8_t flags = 0,
+    uint8_t version = 0);
 
   virtual ~Message();
 
@@ -162,51 +156,35 @@ public:
 
   uint16_t getChecksum();
 
-  size_t getPayloadLength()
-  {
-    return total_len - HEADER_LENGTH - CRC_LENGTH;
-  }
+  size_t getPayloadLength() { return total_len - HEADER_LENGTH - CRC_LENGTH; }
 
-  size_t getPayload(void* buf, size_t max_size);
+  size_t getPayload(void * buf, size_t max_size);
 
-  size_t getTotalLength()
-  {
-    return total_len;
-  }
+  size_t getTotalLength() { return total_len; }
 
-  size_t toBytes(void* buf, size_t buf_size);
+  size_t toBytes(void * buf, size_t buf_size);
 
-  bool isValid(char* whyNot = NULL, size_t strLen = 0);
+  bool isValid(char * whyNot = NULL, size_t strLen = 0);
 
-  bool isCommand()
-  {
-    return getType() < 0x4000;
-  }
+  bool isCommand() { return getType() < 0x4000; }
 
-  bool isRequest()
-  {
-    return (getType() >= 0x4000) && (getType() < 0x8000);
-  }
+  bool isRequest() { return (getType() >= 0x4000) && (getType() < 0x8000); }
 
-  bool isData()
-  {
-    return (getType() >= 0x8000) && (getType() < 0xC000);
-  }
+  bool isData() { return (getType() >= 0x8000) && (getType() < 0xC000); }
 
-  virtual std::ostream& printMessage(std::ostream& stream = std::cout);
+  virtual std::ostream & printMessage(std::ostream & stream = std::cout);
 
-  void printRaw(std::ostream& stream = std::cout);
+  void printRaw(std::ostream & stream = std::cout);
 
-  static Message* factory(void* input, size_t msg_len);
+  static Message * factory(void * input, size_t msg_len);
 
-  static Message* popNext();
+  static Message * popNext();
 
-  static Message* waitNext(double timeout = 0.0);
+  static Message * waitNext(double timeout = 0.0);
 
 };  // class Message
 
-enum MessageTypes
-{
+enum MessageTypes {
   /*
    * Set commands
    */
@@ -312,6 +290,6 @@ enum MessageTypes
 
 }  // namespace clearpath
 
-std::ostream& operator<<(std::ostream& stream, clearpath::Message& msg);
+std::ostream & operator<<(std::ostream & stream, clearpath::Message & msg);
 
 #endif  // CLEARPATH_MESSAGE_H

@@ -4,7 +4,8 @@ from launch.actions import DeclareLaunchArgument, ExecuteProcess, \
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources \
     import PythonLaunchDescriptionSource
-from launch.substitutions import Command, EnvironmentVariable, FindExecutable, LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import Command, EnvironmentVariable, FindExecutable, \
+    LaunchConfiguration, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 

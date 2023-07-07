@@ -44,6 +44,7 @@
  */
 
 #include "husky_base/horizon_legacy/Message_request.h"
+
 #include "husky_base/horizon_legacy/Number.h"
 
 namespace clearpath
@@ -58,8 +59,6 @@ Request::Request(uint16_t type, uint16_t freq) : Message()
   makeValid();
 }
 
-Request::Request(const Request& other) : Message(other)
-{
-}
+Request::Request(const Request & other) : Message(other) {}
 
 }  // namespace clearpath

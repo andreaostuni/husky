@@ -66,15 +66,13 @@ long CmdMessage::total_sent = 0;
 CmdMessage::~CmdMessage()
 {
   ++total_destroyed;
-  if (!is_sent)
-  {
+  if (!is_sent) {
 #ifdef LOGGING_AVAIL
     CPR_WARN() << "Command message destroyed without being sent. Type: "
-               << "0x" << hex << getType() << dec << ". Total unsent: " << (total_destroyed - total_sent) << endl;
+               << "0x" << hex << getType() << dec
+               << ". Total unsent: " << (total_destroyed - total_sent) << endl;
 #endif
-  }
-  else
-  {
+  } else {
     total_sent++;
   }
 }
@@ -87,9 +85,7 @@ CmdProcessorReset::CmdProcessorReset() : CmdMessage()
   makeValid();
 }
 
-CmdProcessorReset::CmdProcessorReset(const CmdProcessorReset& other) : CmdMessage(other)
-{
-}
+CmdProcessorReset::CmdProcessorReset(const CmdProcessorReset & other) : CmdMessage(other) {}
 
 CmdRestoreSettings::CmdRestoreSettings(enum restoreFlags flags) : CmdMessage()
 {
@@ -102,9 +98,7 @@ CmdRestoreSettings::CmdRestoreSettings(enum restoreFlags flags) : CmdMessage()
   makeValid();
 }
 
-CmdRestoreSettings::CmdRestoreSettings(const CmdRestoreSettings& other) : CmdMessage(other)
-{
-}
+CmdRestoreSettings::CmdRestoreSettings(const CmdRestoreSettings & other) : CmdMessage(other) {}
 
 CmdStoreSettings::CmdStoreSettings() : CmdMessage()
 {
@@ -116,9 +110,7 @@ CmdStoreSettings::CmdStoreSettings() : CmdMessage()
   makeValid();
 }
 
-CmdStoreSettings::CmdStoreSettings(const CmdStoreSettings& other) : CmdMessage(other)
-{
-}
+CmdStoreSettings::CmdStoreSettings(const CmdStoreSettings & other) : CmdMessage(other) {}
 
 SetAckermannOutput::SetAckermannOutput(double steer, double throt, double brake) : CmdMessage()
 {
@@ -132,13 +124,11 @@ SetAckermannOutput::SetAckermannOutput(double steer, double throt, double brake)
   makeValid();
 }
 
-SetAckermannOutput::SetAckermannOutput(const SetAckermannOutput& other) : CmdMessage(other)
-{
-}
+SetAckermannOutput::SetAckermannOutput(const SetAckermannOutput & other) : CmdMessage(other) {}
 
-SetDifferentialControl::SetDifferentialControl(double p, double i, double d, double feedfwd, double stic,
-                                               double int_lim)
-  : CmdMessage()
+SetDifferentialControl::SetDifferentialControl(
+  double p, double i, double d, double feedfwd, double stic, double int_lim)
+: CmdMessage()
 {
   setPayloadLength(PAYLOAD_LEN);
 
@@ -160,11 +150,11 @@ SetDifferentialControl::SetDifferentialControl(double p, double i, double d, dou
   makeValid();
 }
 
-SetDifferentialControl::SetDifferentialControl(double left_p, double left_i, double left_d, double left_feedfwd,
-                                               double left_stic, double left_int_lim, double right_p, double right_i,
-                                               double right_d, double right_feedfwd, double right_stic,
-                                               double right_int_lim)
-  : CmdMessage()
+SetDifferentialControl::SetDifferentialControl(
+  double left_p, double left_i, double left_d, double left_feedfwd, double left_stic,
+  double left_int_lim, double right_p, double right_i, double right_d, double right_feedfwd,
+  double right_stic, double right_int_lim)
+: CmdMessage()
 {
   setPayloadLength(PAYLOAD_LEN);
 
@@ -186,7 +176,8 @@ SetDifferentialControl::SetDifferentialControl(double left_p, double left_i, dou
   makeValid();
 }
 
-SetDifferentialControl::SetDifferentialControl(const SetDifferentialControl& other) : CmdMessage(other)
+SetDifferentialControl::SetDifferentialControl(const SetDifferentialControl & other)
+: CmdMessage(other)
 {
 }
 
@@ -200,12 +191,14 @@ SetDifferentialOutput::SetDifferentialOutput(double left, double right) : CmdMes
   makeValid();
 }
 
-SetDifferentialOutput::SetDifferentialOutput(const SetDifferentialOutput& other) : CmdMessage(other)
+SetDifferentialOutput::SetDifferentialOutput(const SetDifferentialOutput & other)
+: CmdMessage(other)
 {
 }
 
-SetDifferentialSpeed::SetDifferentialSpeed(double left_speed, double right_speed, double left_accel, double right_accel)
-  : CmdMessage()
+SetDifferentialSpeed::SetDifferentialSpeed(
+  double left_speed, double right_speed, double left_accel, double right_accel)
+: CmdMessage()
 {
   setPayloadLength(PAYLOAD_LEN);
 
@@ -218,7 +211,7 @@ SetDifferentialSpeed::SetDifferentialSpeed(double left_speed, double right_speed
   makeValid();
 }
 
-SetDifferentialSpeed::SetDifferentialSpeed(const SetDifferentialSpeed& other) : CmdMessage(other)
+SetDifferentialSpeed::SetDifferentialSpeed(const SetDifferentialSpeed & other) : CmdMessage(other)
 {
 }
 
@@ -230,9 +223,7 @@ SetGear::SetGear(uint8_t gear) : CmdMessage()
   makeValid();
 }
 
-SetGear::SetGear(const SetGear& other) : CmdMessage(other)
-{
-}
+SetGear::SetGear(const SetGear & other) : CmdMessage(other) {}
 
 SetMaxAccel::SetMaxAccel(double max_fwd, double max_rev) : CmdMessage()
 {
@@ -245,9 +236,7 @@ SetMaxAccel::SetMaxAccel(double max_fwd, double max_rev) : CmdMessage()
   makeValid();
 }
 
-SetMaxAccel::SetMaxAccel(const SetMaxAccel& other) : CmdMessage(other)
-{
-}
+SetMaxAccel::SetMaxAccel(const SetMaxAccel & other) : CmdMessage(other) {}
 
 SetMaxSpeed::SetMaxSpeed(double max_fwd, double max_rev) : CmdMessage()
 {
@@ -260,16 +249,13 @@ SetMaxSpeed::SetMaxSpeed(double max_fwd, double max_rev) : CmdMessage()
   makeValid();
 }
 
-SetMaxSpeed::SetMaxSpeed(const SetMaxSpeed& other) : CmdMessage(other)
-{
-}
+SetMaxSpeed::SetMaxSpeed(const SetMaxSpeed & other) : CmdMessage(other) {}
 
-SetPlatformName::SetPlatformName(const char* name) : CmdMessage()
+SetPlatformName::SetPlatformName(const char * name) : CmdMessage()
 {
   size_t cpy_len = strlen(name);
   size_t max_len = MAX_MSG_LENGTH - HEADER_LENGTH - CRC_LENGTH - 1 /* for size field */;
-  if (cpy_len > max_len)
-  {
+  if (cpy_len > max_len) {
     cpy_len = max_len;
   }
 
@@ -282,9 +268,7 @@ SetPlatformName::SetPlatformName(const char* name) : CmdMessage()
   makeValid();
 }
 
-SetPlatformName::SetPlatformName(const SetPlatformName& other) : CmdMessage(other)
-{
-}
+SetPlatformName::SetPlatformName(const SetPlatformName & other) : CmdMessage(other) {}
 
 SetPlatformTime::SetPlatformTime(uint32_t time) : CmdMessage()
 {
@@ -294,9 +278,7 @@ SetPlatformTime::SetPlatformTime(uint32_t time) : CmdMessage()
   makeValid();
 }
 
-SetPlatformTime::SetPlatformTime(const SetPlatformTime& other) : CmdMessage(other)
-{
-}
+SetPlatformTime::SetPlatformTime(const SetPlatformTime & other) : CmdMessage(other) {}
 
 SetSafetySystem::SetSafetySystem(uint16_t flags) : CmdMessage()
 {
@@ -306,9 +288,7 @@ SetSafetySystem::SetSafetySystem(uint16_t flags) : CmdMessage()
   makeValid();
 }
 
-SetSafetySystem::SetSafetySystem(const SetSafetySystem& other) : CmdMessage(other)
-{
-}
+SetSafetySystem::SetSafetySystem(const SetSafetySystem & other) : CmdMessage(other) {}
 
 SetTurn::SetTurn(double trans, double rad, double accel) : CmdMessage()
 {
@@ -322,9 +302,7 @@ SetTurn::SetTurn(double trans, double rad, double accel) : CmdMessage()
   makeValid();
 }
 
-SetTurn::SetTurn(const SetTurn& other) : CmdMessage(other)
-{
-}
+SetTurn::SetTurn(const SetTurn & other) : CmdMessage(other) {}
 
 SetVelocity::SetVelocity(double trans, double rot, double accel) : CmdMessage()
 {
@@ -338,8 +316,6 @@ SetVelocity::SetVelocity(double trans, double rot, double accel) : CmdMessage()
   makeValid();
 }
 
-SetVelocity::SetVelocity(const SetVelocity& other) : CmdMessage(other)
-{
-}
+SetVelocity::SetVelocity(const SetVelocity & other) : CmdMessage(other) {}
 
 }  // namespace clearpath

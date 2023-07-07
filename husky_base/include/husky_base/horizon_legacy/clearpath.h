@@ -48,8 +48,8 @@
 
 #include "husky_base/horizon_legacy/Message.h"
 #include "husky_base/horizon_legacy/Message_cmd.h"
-#include "husky_base/horizon_legacy/Message_request.h"
 #include "husky_base/horizon_legacy/Message_data.h"
+#include "husky_base/horizon_legacy/Message_request.h"
 #include "husky_base/horizon_legacy/Transport.h"
 
 #endif  // CLEARPATH_H

@@ -26,9 +26,8 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
 #ifndef HUSKY_BASE__HUSKY_STATUS_HPP
 #define HUSKY_BASE__HUSKY_STATUS_HPP
 
-#include "rclcpp/rclcpp.hpp"
-
 #include "husky_msgs/msg/husky_status.hpp"
+#include "rclcpp/rclcpp.hpp"
 
 namespace husky_status
 {

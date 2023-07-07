@@ -57,7 +57,7 @@ class Request : public Message
 public:
   Request(uint16_t type, uint16_t freq = 0);
 
-  Request(const Request& other);
+  Request(const Request & other);
 };
 
 }  // namespace clearpath

@@ -44,10 +44,11 @@
  *
  */
 
-#include <iostream>
-#include <fstream>
 #include <signal.h>
 #include <unistd.h>
+
+#include <fstream>
+#include <iostream>
 
 using namespace std;
 
@@ -56,14 +57,13 @@ using namespace std;
 namespace clearpath
 {
 
-const char* Logger::levelNames[] = { "ERROR", "EXCEPTION", "WARNING", "INFO", "DETAIL" };
+const char * Logger::levelNames[] = {"ERROR", "EXCEPTION", "WARNING", "INFO", "DETAIL"};
 
 void loggerTermHandler(int signum)
 {
   Logger::instance().close();
 
-  if ((signum == SIGABRT) || (signum == SIGSEGV))
-  {
+  if ((signum == SIGABRT) || (signum == SIGSEGV)) {
     /* We need to catch these so we can flush out any last messages.
      * having done this, probably the most consistent thing to do
      * is re-raise the signal.  (We certainly don't want to just
@@ -73,7 +73,7 @@ void loggerTermHandler(int signum)
   }
 }
 
-Logger& Logger::instance()
+Logger & Logger::instance()
 {
   static Logger instance;
   return instance;
@@ -84,10 +84,7 @@ Logger::Logger() : enabled(true), level(WARNING), stream(&cerr)
   nullStream = new ofstream("/dev/null");
 }
 
-Logger::~Logger()
-{
-  close();
-}
+Logger::~Logger() { close(); }
 
 void Logger::close()
 {
@@ -99,14 +96,12 @@ void Logger::close()
   nullStream = 0;
 }
 
-std::ostream& Logger::entry(enum logLevels msg_level, const char* file, int line)
+std::ostream & Logger::entry(enum logLevels msg_level, const char * file, int line)
 {
-  if (!enabled)
-  {
+  if (!enabled) {
     return *nullStream;
   }
-  if (msg_level > this->level)
-  {
+  if (msg_level > this->level) {
     return *nullStream;
   }
 
@@ -114,20 +109,16 @@ std::ostream& Logger::entry(enum logLevels msg_level, const char* file, int line
   // Always the level of the message
   *stream << levelNames[msg_level];
   // If file/line information is provided, need to print it with brackets:
-  if (file || (line >= 0))
-  {
+  if (file || (line >= 0)) {
     *stream << " (";
-    if (file)
-    {
+    if (file) {
       *stream << file;
     }
     // Only want a comma if we have both items
-    if (file && (line >= 0))
-    {
+    if (file && (line >= 0)) {
       *stream << ",";
     }
-    if (line >= 0)
-    {
+    if (line >= 0) {
       *stream << line;
     }
     *stream << ")";
@@ -136,17 +127,11 @@ std::ostream& Logger::entry(enum logLevels msg_level, const char* file, int line
   return *stream;
 }
 
-void Logger::setEnabled(bool en)
-{
-  enabled = en;
-}
+void Logger::setEnabled(bool en) { enabled = en; }
 
-void Logger::setLevel(enum logLevels newLevel)
-{
-  level = newLevel;
-}
+void Logger::setLevel(enum logLevels newLevel) { level = newLevel; }
 
-void Logger::setStream(ostream* newStream)
+void Logger::setStream(ostream * newStream)
 {
   stream->flush();
   stream = newStream;
