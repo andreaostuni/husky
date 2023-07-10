@@ -16,23 +16,25 @@ def generate_launch_description():
     )
 
     node_joint_state_publisher_gui = Node(
-        package='joint_state_publisher_gui',
-        executable='joint_state_publisher_gui',
-        name='joint_state_publisher_gui'
+        package="joint_state_publisher_gui",
+        executable="joint_state_publisher_gui",
+        name="joint_state_publisher_gui",
     )
 
     node_rviz = Node(
-        package='rviz2',
-        executable='rviz2',
-        name='rviz',
-        arguments=['-d', rviz_config_file],
-        output='screen'
+        package="rviz2",
+        executable="rviz2",
+        name="rviz",
+        arguments=["-d", rviz_config_file],
+        output="screen",
     )
 
     launch_husky_description = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(get_package_share_directory(
-                'husky_description'), 'launch/description_launch.py')
+            os.path.join(
+                get_package_share_directory("husky_description"),
+                "launch/description_launch.py",
+            )
         )
     )
 

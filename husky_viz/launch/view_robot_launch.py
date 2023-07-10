@@ -11,11 +11,11 @@ def generate_launch_description():
     )
 
     node_rviz = Node(
-        package='rviz2',
-        executable='rviz2',
-        name='rviz',
-        arguments=['-d', rviz_config_file],
-        output='screen'
+        package="rviz2",
+        executable="rviz2",
+        name="rviz",
+        arguments=["-d", rviz_config_file],
+        output="screen",
     )
 
     return LaunchDescription(
