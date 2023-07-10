@@ -1,6 +1,7 @@
-name: husky_ci
+name: Build and Test
 
 on:
+  workflow_dispatch:
   push:
     branches: [humble-devel]
   pull_request:
