@@ -58,13 +58,20 @@ private:
   bool enabled;
   int level;
 
-  std::ostream * stream;
+  std::ostream* stream;
 
-  std::ofstream * nullStream;  // i.e /dev/null
+  std::ofstream* nullStream;  // i.e /dev/null
 
 public:
-  enum logLevels { ERROR_LEV, EXCEPTION, WARNING, INFO, DETAIL };
-  static const char * levelNames[];  // strings indexed by enumeration.
+  enum logLevels
+  {
+    ERROR_LEV,
+    EXCEPTION,
+    WARNING,
+    INFO,
+    DETAIL
+  };
+  static const char* levelNames[];  // strings indexed by enumeration.
 
 private:
   Logger();
@@ -74,15 +81,15 @@ private:
   void close();
 
 public:
-  static Logger & instance();
+  static Logger& instance();
 
-  std::ostream & entry(enum logLevels level, const char * file = 0, int line = -1);
+  std::ostream& entry(enum logLevels level, const char* file = 0, int line = -1);
 
   void setEnabled(bool enabled);
 
   void setLevel(enum logLevels newLevel);
 
-  void setStream(std::ostream * stream);
+  void setStream(std::ostream* stream);
 
   void hookFatalSignals();
 

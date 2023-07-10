@@ -41,7 +41,8 @@ namespace horizon_legacy
 
 void reconnect()
 {
-  if (port_.empty()) {
+  if (port_.empty())
+  {
     throw std::logic_error("Can't reconnect when port is not configured");
   }
   std::cout << "Connecting to Husky on port " << port_ << "...";
@@ -58,12 +59,16 @@ void connect(std::string port)
 void configureLimits(double max_speed, double max_accel)
 {
   bool success = false;
-  while (!success) {
-    try {
+  while (!success)
+  {
+    try
+    {
       clearpath::SetMaxAccel(max_accel, max_accel).send();
       clearpath::SetMaxSpeed(max_speed, max_speed).send();
       success = true;
-    } catch (clearpath::Exception * ex) {
+    }
+    catch (clearpath::Exception* ex)
+    {
       std::cout << "Error configuring velocity and accel limits: " << ex->message;
       reconnect();
     }
@@ -73,11 +78,15 @@ void configureLimits(double max_speed, double max_accel)
 void controlSpeed(double speed_left, double speed_right, double accel_left, double accel_right)
 {
   bool success = false;
-  while (!success) {
-    try {
+  while (!success)
+  {
+    try
+    {
       clearpath::SetDifferentialSpeed(speed_left, speed_right, accel_left, accel_right).send();
       success = true;
-    } catch (clearpath::Exception * ex) {
+    }
+    catch (clearpath::Exception* ex)
+    {
       std::cout << "Error sending speed and accel command: " << ex->message;
       reconnect();
     }

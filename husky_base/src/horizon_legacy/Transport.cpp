@@ -68,21 +68,22 @@ using namespace std;
 namespace clearpath
 {
 
-const char * Transport::counter_names[] = {
-  "Garbled bytes", "Invalid messages", "Ignored acknowledgment", "Message queue overflow"};
+const char* Transport::counter_names[] = { "Garbled bytes", "Invalid messages", "Ignored acknowledgment",
+                                           "Message queue overflow" };
 
-TransportException::TransportException(const char * msg, enum errors ex_type)
-: Exception(msg), type(ex_type)
+TransportException::TransportException(const char* msg, enum errors ex_type) : Exception(msg), type(ex_type)
 {
-  if (msg) {
+  if (msg)
+  {
     CPR_EXCEPT() << "TransportException " << (int)type << ": " << message << endl << std::flush;
   }
 }
 
 BadAckException::BadAckException(unsigned int flag)
-: TransportException(NULL, TransportException::BAD_ACK_RESULT), ack_flag((enum ackFlags)flag)
+  : TransportException(NULL, TransportException::BAD_ACK_RESULT), ack_flag((enum ackFlags)flag)
 {
-  switch (ack_flag) {
+  switch (ack_flag)
+  {
     case BAD_CHECKSUM:
       message = "Bad checksum";
       break;
@@ -110,19 +111,20 @@ BadAckException::BadAckException(unsigned int flag)
   CPR_EXCEPT() << "BadAckException (0x" << hex << flag << dec << "): " << message << endl << flush;
 }
 
-#define CHECK_THROW_CONFIGURED()                                         \
-  do {                                                                   \
-    if (!configured) {                                                   \
-      throw new TransportException(                                      \
-        "Transport not configured", TransportException::NOT_CONFIGURED); \
-    }                                                                    \
+#define CHECK_THROW_CONFIGURED()                                                                                       \
+  do                                                                                                                   \
+  {                                                                                                                    \
+    if (!configured)                                                                                                   \
+    {                                                                                                                  \
+      throw new TransportException("Transport not configured", TransportException::NOT_CONFIGURED);                    \
+    }                                                                                                                  \
   } while (0)
 
 /**
  * Transport singleton instance accessor.
  * @return  The Transport singleton instance.
  */
-Transport & Transport::instance()
+Transport& Transport::instance()
 {
   static Transport instance;
   return instance;
@@ -133,12 +135,16 @@ Transport & Transport::instance()
  */
 Transport::Transport() : configured(false), serial(0), retries(0)
 {
-  for (int i = 0; i < NUM_COUNTERS; ++i) {
+  for (int i = 0; i < NUM_COUNTERS; ++i)
+  {
     counters[i] = 0;
   }
 }
 
-Transport::~Transport() { close(); }
+Transport::~Transport()
+{
+  close();
+}
 
 /**
  * Configure this Transport for communication.
@@ -150,9 +156,10 @@ Transport::~Transport() { close(); }
  * @throws TransportException if configuration fails
  * @post Transport becomes configured.
  */
-void Transport::configure(const char * device, int retries)
+void Transport::configure(const char* device, int retries)
 {
-  if (configured) {
+  if (configured)
+  {
     // Close serial
     close();
   }
@@ -162,9 +169,12 @@ void Transport::configure(const char * device, int retries)
 
   this->retries = retries;
 
-  if (!openComm(device)) {
+  if (!openComm(device))
+  {
     configured = true;
-  } else {
+  }
+  else
+  {
     throw new TransportException("Failed to open serial port", TransportException::CONFIGURE_FAIL);
   }
 }
@@ -177,7 +187,8 @@ void Transport::configure(const char * device, int retries)
 int Transport::close()
 {
   int retval = 0;
-  if (configured) {
+  if (configured)
+  {
     flush();
     retval = closeComm();
   }
@@ -189,14 +200,16 @@ int Transport::close()
  * Opens a serial port with the default configuration
  * (115200 bps, 8-N-1), using the device specified in the constructor
  */
-int Transport::openComm(const char * device)
+int Transport::openComm(const char* device)
 {
   int tmp = OpenSerial(&(this->serial), device);
-  if (tmp < 0) {
+  if (tmp < 0)
+  {
     return -1;
   }
   tmp = SetupSerial(this->serial);
-  if (tmp < 0) {
+  if (tmp < 0)
+  {
     return -2;
   }
   return 0;
@@ -220,7 +233,7 @@ int Transport::closeComm()
  *          this call.  Null if no complete message has been received.  Bad data
  *          are silently eaten.
  */
-Message * Transport::rxMessage()
+Message* Transport::rxMessage()
 {
   /* Each time this function is called, any available characters are added
    * to the receive buffer.  A new Message is created and returned when
@@ -230,19 +243,25 @@ Message * Transport::rxMessage()
   static size_t rx_inx = 0;
   static size_t msg_len = 0;
 
-  if (!rx_inx) {
+  if (!rx_inx)
+  {
     memset(rx_buf, 0xba, Message::MAX_MSG_LENGTH);
   }
 
   /* Read in and handle characters, one at a time.
    * (This is a simple state machine, using 'rx_inx' as state) */
-  while (ReadData(serial, rx_buf + rx_inx, 1) == 1) {
-    switch (rx_inx) {
+  while (ReadData(serial, rx_buf + rx_inx, 1) == 1)
+  {
+    switch (rx_inx)
+    {
       /* Waiting for SOH */
       case 0:
-        if ((uint8_t)(rx_buf[0]) == (uint8_t)(Message::SOH)) {
+        if ((uint8_t)(rx_buf[0]) == (uint8_t)(Message::SOH))
+        {
           rx_inx++;
-        } else {
+        }
+        else
+        {
           counters[GARBLE_BYTES]++;
         }
         break;
@@ -258,9 +277,8 @@ Message * Transport::rxMessage()
         msg_len = rx_buf[1] + 3;
 
         /* Check for valid length */
-        if (
-          static_cast<unsigned char>(rx_buf[1] ^ rx_buf[2]) != 0xFF ||
-          (msg_len < Message::MIN_MSG_LENGTH)) {
+        if (static_cast<unsigned char>(rx_buf[1] ^ rx_buf[2]) != 0xFF || (msg_len < Message::MIN_MSG_LENGTH))
+        {
           counters[GARBLE_BYTES] += rx_inx;
           rx_inx = 0;
         }
@@ -275,12 +293,13 @@ Message * Transport::rxMessage()
         /* Waiting for the rest of the message */
       default:
         rx_inx++;
-        if (rx_inx < msg_len) {
+        if (rx_inx < msg_len)
+        {
           break;
         }
         /* Finished rxing, reset this state machine and return msg */
         rx_inx = 0;
-        Message * msg = Message::factory(rx_buf, msg_len);
+        Message* msg = Message::factory(rx_buf, msg_len);
         return msg;
 
     }  // switch( rx_inx )
@@ -296,19 +315,22 @@ Message * Transport::rxMessage()
  * @return  The next ack message, if one is read.
  *          Null if no ack message has been read yet.
  */
-Message * Transport::getAck()
+Message* Transport::getAck()
 {
-  Message * msg = NULL;
+  Message* msg = NULL;
 
-  while ((msg = rxMessage())) {
+  while ((msg = rxMessage()))
+  {
     /* Queue any data messages that turn up */
-    if (msg->isData()) {
+    if (msg->isData())
+    {
       enqueueMessage(msg);
       continue;
     }
 
     /* Drop invalid messages */
-    if (!msg->isValid()) {
+    if (!msg->isValid())
+    {
       ++counters[INVALID_MSG];
       delete msg;
       continue;
@@ -326,10 +348,11 @@ Message * Transport::getAck()
  * Trims queue down to size if it gets too big.
  * @param msg   The message to enqueue.
  */
-void Transport::enqueueMessage(Message * msg)
+void Transport::enqueueMessage(Message* msg)
 {
   /* Reject invalid messages */
-  if (!msg->isValid()) {
+  if (!msg->isValid())
+  {
     ++counters[INVALID_MSG];
     delete msg;
     return;
@@ -339,7 +362,8 @@ void Transport::enqueueMessage(Message * msg)
   rx_queue.push_back(msg);
 
   /* Drop the oldest messages if the queue has overflowed */
-  while (rx_queue.size() > MAX_QUEUE_LEN) {
+  while (rx_queue.size() > MAX_QUEUE_LEN)
+  {
     ++counters[QUEUE_FULL];
     delete rx_queue.front();
     rx_queue.pop_front();
@@ -356,11 +380,13 @@ void Transport::poll()
 {
   CHECK_THROW_CONFIGURED();
 
-  Message * msg = NULL;
+  Message* msg = NULL;
 
-  while ((msg = rxMessage())) {
+  while ((msg = rxMessage()))
+  {
     /* We're not waiting for acks, so drop them */
-    if (!msg->isData()) {
+    if (!msg->isData())
+    {
       ++counters[IGNORED_ACK];
       delete msg;
       continue;
@@ -378,37 +404,43 @@ void Transport::poll()
  * @param m The message to send
  * @throw   Transport::Exception if never acknowledged.
  */
-void Transport::send(Message * m)
+void Transport::send(Message* m)
 {
   CHECK_THROW_CONFIGURED();
 
   char skip_send = 0;
-  Message * ack = NULL;
+  Message* ack = NULL;
   int transmit_times = 0;
   short result_code;
 
   poll();
 
-  while (1) {
+  while (1)
+  {
     // We have exceeded our retry numbers
-    if (transmit_times > this->retries) {
+    if (transmit_times > this->retries)
+    {
       break;
     }
     // Write output
-    if (!skip_send) {
-      WriteData(serial, (char *)(m->data), m->total_len);
+    if (!skip_send)
+    {
+      WriteData(serial, (char*)(m->data), m->total_len);
     }
 
     // Wait up to 100 ms for ack
-    for (int i = 0; i < RETRY_DELAY_MS; ++i) {
+    for (int i = 0; i < RETRY_DELAY_MS; ++i)
+    {
       usleep(1000);
-      if ((ack = getAck())) {
+      if ((ack = getAck()))
+      {
         break;
       }
     }
 
     // No message - resend
-    if (ack == NULL) {
+    if (ack == NULL)
+    {
       skip_send = 0;
       // cout << "No message received yet" << endl;
       transmit_times++;
@@ -419,16 +451,20 @@ void Transport::send(Message * m)
     // If the result code is bad, the message was still transmitted
     // successfully
     result_code = btou(ack->getPayloadPointer(), 2);
-    if (result_code > 0) {
+    if (result_code > 0)
+    {
       throw new BadAckException(result_code);
-    } else {
+    }
+    else
+    {
       // Everything's good - return
       break;
     }
     // Other failure
     transmit_times++;
   }
-  if (ack == NULL) {
+  if (ack == NULL)
+  {
     throw new TransportException("Unacknowledged send", TransportException::UNACKNOWLEDGED_SEND);
   }
   delete ack;
@@ -444,17 +480,18 @@ void Transport::send(Message * m)
  *          is responsible for freeing it.
  *          Null if no Messages are currently queued.
  */
-Message * Transport::popNext()
+Message* Transport::popNext()
 {
   CHECK_THROW_CONFIGURED();
 
   poll();  // empty the current serial RX queue.
 
-  if (rx_queue.empty()) {
+  if (rx_queue.empty())
+  {
     return NULL;
   }
 
-  Message * next = rx_queue.front();
+  Message* next = rx_queue.front();
   rx_queue.pop_front();
   return next;
 }
@@ -469,16 +506,18 @@ Message * Transport::popNext()
  *          is responsible for freeing it.
  *          Null if no Messages are currently queued.
  */
-Message * Transport::popNext(enum MessageTypes type)
+Message* Transport::popNext(enum MessageTypes type)
 {
   CHECK_THROW_CONFIGURED();
 
   poll();  // empty the current RX queue
 
-  Message * next;
-  list<Message *>::iterator iter;
-  for (iter = rx_queue.begin(); iter != rx_queue.end(); ++iter) {
-    if ((*iter)->getType() == type) {
+  Message* next;
+  list<Message*>::iterator iter;
+  for (iter = rx_queue.begin(); iter != rx_queue.end(); ++iter)
+  {
+    if ((*iter)->getType() == type)
+    {
       next = *iter;
       rx_queue.erase(iter);
       return next;
@@ -493,20 +532,23 @@ Message * Transport::popNext(enum MessageTypes type)
  *                  Actual resolution is system dependent
  *                  A timeout of 0.0 indicates no timeout.
  * @return  A message.  Null if the timeout elapses. */
-Message * Transport::waitNext(double timeout)
+Message* Transport::waitNext(double timeout)
 {
   CHECK_THROW_CONFIGURED();
 
   double elapsed = 0.0;
-  while (true) {
+  while (true)
+  {
     /* Return a message if it's turned up */
     poll();
-    if (!rx_queue.empty()) {
+    if (!rx_queue.empty())
+    {
       return popNext();
     }
 
     /* Check timeout */
-    if ((timeout != 0.0) && (elapsed > timeout)) {
+    if ((timeout != 0.0) && (elapsed > timeout))
+    {
       // If we have a timeout set, and it has elapsed, exit.
       return NULL;
     }
@@ -525,25 +567,28 @@ Message * Transport::waitNext(double timeout)
  *                  A timeout of 0.0 indicates no timeout.
  * @return A message of the requested type.  Nul if the timeout elapses.
  */
-Message * Transport::waitNext(enum MessageTypes type, double timeout)
+Message* Transport::waitNext(enum MessageTypes type, double timeout)
 {
   CHECK_THROW_CONFIGURED();
 
   double elapsed = 0.0;
-  Message * msg;
+  Message* msg;
 
-  while (true) {
+  while (true)
+  {
     /* Check if the message has turned up
      * Since we're blocking, not doing anything useful anyway, it doesn't
      * really matter that we're iterating the entire message queue every spin. */
     poll();
     msg = popNext(type);
-    if (msg) {
+    if (msg)
+    {
       return msg;
     }
 
     /* Check timeout */
-    if ((timeout != 0.0) && (elapsed > timeout)) {
+    if ((timeout != 0.0) && (elapsed > timeout))
+    {
       // If a timeout is set and has elapsed, fail out.
       return NULL;
     }
@@ -561,7 +606,7 @@ Message * Transport::waitNext(enum MessageTypes type, double timeout)
  *              added to this list, oldest first.
  *              If null, messages will be deleted.
  */
-void Transport::flush(list<Message *> * queue)
+void Transport::flush(list<Message*>* queue)
 {
   CHECK_THROW_CONFIGURED();
 
@@ -569,11 +614,15 @@ void Transport::flush(list<Message *> * queue)
 
   /* Either delete or move all elements in the queue, depending
    * on whether a destination list is provided */
-  list<Message *>::iterator iter;
-  for (iter = rx_queue.begin(); iter != rx_queue.end(); ++iter) {
-    if (queue) {
+  list<Message*>::iterator iter;
+  for (iter = rx_queue.begin(); iter != rx_queue.end(); ++iter)
+  {
+    if (queue)
+    {
       queue->push_back(*iter);
-    } else {
+    }
+    else
+    {
       delete *iter;
     }
   }
@@ -590,25 +639,32 @@ void Transport::flush(list<Message *> * queue)
  *              added to this list, oldest first.
  *              If null, messages of the correct type will be deleted.
  */
-void Transport::flush(enum MessageTypes type, list<Message *> * queue)
+void Transport::flush(enum MessageTypes type, list<Message*>* queue)
 {
   CHECK_THROW_CONFIGURED();
 
   poll();
 
-  list<Message *>::iterator iter = rx_queue.begin();
-  while (iter != rx_queue.end()) {
-    if ((*iter)->getType() == type) {
+  list<Message*>::iterator iter = rx_queue.begin();
+  while (iter != rx_queue.end())
+  {
+    if ((*iter)->getType() == type)
+    {
       /* Element is of flush type.  If there's a destination
        * list, move it.  Otherwise, destroy it */
-      if (queue) {
+      if (queue)
+      {
         queue->push_back(*iter);
-      } else {
+      }
+      else
+      {
         delete *iter;
       }
       // This advances to the next element in the queue:
       iter = rx_queue.erase(iter);
-    } else {
+    }
+    else
+    {
       // Not interested in this element.  Next!
       iter++;
     }
@@ -618,21 +674,24 @@ void Transport::flush(enum MessageTypes type, list<Message *> * queue)
 /**
  * Prints a nice list of counter values
  */
-void Transport::printCounters(ostream & stream)
+void Transport::printCounters(ostream& stream)
 {
   stream << "Transport Counters" << endl;
   stream << "==================" << endl;
 
   size_t longest_name = 0;
   size_t cur_len = 0;
-  for (int i = 0; i < NUM_COUNTERS; ++i) {
+  for (int i = 0; i < NUM_COUNTERS; ++i)
+  {
     cur_len = strlen(counter_names[i]);
-    if (cur_len > longest_name) {
+    if (cur_len > longest_name)
+    {
       longest_name = cur_len;
     }
   }
 
-  for (int i = 0; i < NUM_COUNTERS; ++i) {
+  for (int i = 0; i < NUM_COUNTERS; ++i)
+  {
     cout.width(longest_name);
     cout << left << counter_names[i] << ": " << counters[i] << endl;
   }
@@ -647,7 +706,8 @@ void Transport::printCounters(ostream & stream)
  */
 void Transport::resetCounters()
 {
-  for (int i = 0; i < NUM_COUNTERS; ++i) {
+  for (int i = 0; i < NUM_COUNTERS; ++i)
+  {
     counters[i] = 0;
   }
 }

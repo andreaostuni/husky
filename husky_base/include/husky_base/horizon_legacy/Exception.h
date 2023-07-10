@@ -55,10 +55,12 @@ namespace clearpath
 class Exception
 {
 public:
-  const char * message;
+  const char* message;
 
 protected:
-  Exception(const char * msg = "none") : message(msg) {}
+  Exception(const char* msg = "none") : message(msg)
+  {
+  }
 };
 
 }  // namespace clearpath

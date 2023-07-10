@@ -42,49 +42,48 @@ namespace husky_base
 class HuskySoftwareDiagnosticTask : public diagnostic_updater::DiagnosticTask
 {
 public:
-  explicit HuskySoftwareDiagnosticTask(
-    husky_msgs::msg::HuskyStatus & msg, double target_control_freq);
+  explicit HuskySoftwareDiagnosticTask(husky_msgs::msg::HuskyStatus& msg, double target_control_freq);
 
-  void run(diagnostic_updater::DiagnosticStatusWrapper & stat);
+  void run(diagnostic_updater::DiagnosticStatusWrapper& stat);
 
   void updateControlFrequency(double frequency);
 
 private:
   void reset();
 
-  husky_msgs::msg::HuskyStatus & msg_;
+  husky_msgs::msg::HuskyStatus& msg_;
   double control_freq_, target_control_freq_;
 };
 
 class HuskyHardwareSystemDiagnosticTask : public diagnostic_updater::DiagnosticTask
 {
 public:
-  explicit HuskyHardwareSystemDiagnosticTask(husky_msgs::msg::HuskyStatus & msg);
+  explicit HuskyHardwareSystemDiagnosticTask(husky_msgs::msg::HuskyStatus& msg);
 
-  void run(diagnostic_updater::DiagnosticStatusWrapper & stat);
+  void run(diagnostic_updater::DiagnosticStatusWrapper& stat);
 
 private:
-  husky_msgs::msg::HuskyStatus & msg_;
+  husky_msgs::msg::HuskyStatus& msg_;
 };
 
 class HuskyHardwarePowerDiagnosticTask : public diagnostic_updater::DiagnosticTask
 {
 public:
-  explicit HuskyHardwarePowerDiagnosticTask(husky_msgs::msg::HuskyStatus & msg);
-  void run(diagnostic_updater::DiagnosticStatusWrapper & stat);
+  explicit HuskyHardwarePowerDiagnosticTask(husky_msgs::msg::HuskyStatus& msg);
+  void run(diagnostic_updater::DiagnosticStatusWrapper& stat);
 
 private:
-  husky_msgs::msg::HuskyStatus & msg_;
+  husky_msgs::msg::HuskyStatus& msg_;
 };
 
 class HuskyHardwareSafetyDiagnosticTask : public diagnostic_updater::DiagnosticTask
 {
 public:
-  explicit HuskyHardwareSafetyDiagnosticTask(husky_msgs::msg::HuskyStatus & msg);
-  void run(diagnostic_updater::DiagnosticStatusWrapper & stat);
+  explicit HuskyHardwareSafetyDiagnosticTask(husky_msgs::msg::HuskyStatus& msg);
+  void run(diagnostic_updater::DiagnosticStatusWrapper& stat);
 
 private:
-  husky_msgs::msg::HuskyStatus & msg_;
+  husky_msgs::msg::HuskyStatus& msg_;
 };
 
 }  // namespace husky_base

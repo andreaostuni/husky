@@ -81,21 +81,24 @@ static const std::string RIGHT_CMD_JOINT_NAME = "front_right_wheel_joint";
 void HuskyHardware::resetTravelOffset()
 {
   horizon_legacy::Channel<clearpath::DataEncoders>::Ptr enc =
-    horizon_legacy::Channel<clearpath::DataEncoders>::requestData(polling_timeout_);
-  if (enc) {
-    for (auto i = 0u; i < hw_states_position_offset_.size(); i++) {
+      horizon_legacy::Channel<clearpath::DataEncoders>::requestData(polling_timeout_);
+  if (enc)
+  {
+    for (auto i = 0u; i < hw_states_position_offset_.size(); i++)
+    {
       hw_states_position_offset_[i] = linearToAngular(enc->getTravel(isLeft(info_.joints[i].name)));
     }
-  } else {
-    RCLCPP_FATAL(
-      rclcpp::get_logger(HW_NAME), "Could not get encoder data to calibrate travel offset");
+  }
+  else
+  {
+    RCLCPP_FATAL(rclcpp::get_logger(HW_NAME), "Could not get encoder data to calibrate travel offset");
   }
 }
 
 /**
  * Husky reports travel in metres, need radians for ros_control RobotHW
  */
-double HuskyHardware::linearToAngular(const double & travel) const
+double HuskyHardware::linearToAngular(const double& travel) const
 {
   return (travel / wheel_diameter_ * 2.0f);
 }
@@ -103,7 +106,7 @@ double HuskyHardware::linearToAngular(const double & travel) const
 /**
  * RobotHW provides velocity command in rad/s, Husky needs m/s,
  */
-double HuskyHardware::angularToLinear(const double & angle) const
+double HuskyHardware::angularToLinear(const double& angle) const
 {
   return (angle * wheel_diameter_ / 2.0f);
 }
@@ -118,11 +121,12 @@ void HuskyHardware::writeCommandsToHardware()
   horizon_legacy::controlSpeed(diff_speed_left, diff_speed_right, max_accel_, max_accel_);
 }
 
-void HuskyHardware::limitDifferentialSpeed(double & diff_speed_left, double & diff_speed_right)
+void HuskyHardware::limitDifferentialSpeed(double& diff_speed_left, double& diff_speed_right)
 {
   double large_speed = std::max(std::abs(diff_speed_left), std::abs(diff_speed_right));
 
-  if (large_speed > max_speed_) {
+  if (large_speed > max_speed_)
+  {
     diff_speed_left *= max_speed_ / large_speed;
     diff_speed_right *= max_speed_ / large_speed;
   }
@@ -134,44 +138,56 @@ void HuskyHardware::limitDifferentialSpeed(double & diff_speed_left, double & di
 void HuskyHardware::updateJointsFromHardware()
 {
   horizon_legacy::Channel<clearpath::DataEncoders>::Ptr enc =
-    horizon_legacy::Channel<clearpath::DataEncoders>::requestData(polling_timeout_);
-  if (enc) {
-    RCLCPP_DEBUG(
-      rclcpp::get_logger(HW_NAME), "Received linear distance information (L: %f, R: %f)",
-      enc->getTravel(LEFT), enc->getTravel(RIGHT));
+      horizon_legacy::Channel<clearpath::DataEncoders>::requestData(polling_timeout_);
+  if (enc)
+  {
+    RCLCPP_DEBUG(rclcpp::get_logger(HW_NAME), "Received linear distance information (L: %f, R: %f)",
+                 enc->getTravel(LEFT), enc->getTravel(RIGHT));
 
-    for (auto i = 0u; i < hw_states_position_.size(); i++) {
-      double delta = linearToAngular(enc->getTravel(isLeft(info_.joints[i].name))) -
-                     hw_states_position_[i] - hw_states_position_offset_[i];
+    for (auto i = 0u; i < hw_states_position_.size(); i++)
+    {
+      double delta = linearToAngular(enc->getTravel(isLeft(info_.joints[i].name))) - hw_states_position_[i] -
+                     hw_states_position_offset_[i];
 
       // detect suspiciously large readings, possibly from encoder rollover
-      if (std::abs(delta) < 1.0f) {
+      if (std::abs(delta) < 1.0f)
+      {
         hw_states_position_[i] += delta;
-      } else {
+      }
+      else
+      {
         // suspicious! drop this measurement and update the offset for subsequent readings
         hw_states_position_offset_[i] += delta;
         RCLCPP_WARN(rclcpp::get_logger(HW_NAME), "Dropping overflow measurement from encoder");
       }
     }
-  } else {
+  }
+  else
+  {
     RCLCPP_ERROR(rclcpp::get_logger(HW_NAME), "Could not get encoder data");
   }
 
   horizon_legacy::Channel<clearpath::DataDifferentialSpeed>::Ptr speed =
-    horizon_legacy::Channel<clearpath::DataDifferentialSpeed>::requestData(polling_timeout_);
-  if (speed) {
-    RCLCPP_DEBUG(
-      rclcpp::get_logger(HW_NAME), "Received linear speed information (L: %f, R: %f)",
-      speed->getLeftSpeed(), speed->getRightSpeed());
+      horizon_legacy::Channel<clearpath::DataDifferentialSpeed>::requestData(polling_timeout_);
+  if (speed)
+  {
+    RCLCPP_DEBUG(rclcpp::get_logger(HW_NAME), "Received linear speed information (L: %f, R: %f)", speed->getLeftSpeed(),
+                 speed->getRightSpeed());
 
-    for (auto i = 0u; i < hw_states_velocity_.size(); i++) {
-      if (isLeft(info_.joints[i].name) == LEFT) {
+    for (auto i = 0u; i < hw_states_velocity_.size(); i++)
+    {
+      if (isLeft(info_.joints[i].name) == LEFT)
+      {
         hw_states_velocity_[i] = linearToAngular(speed->getLeftSpeed());
-      } else {  // assume RIGHT
+      }
+      else
+      {  // assume RIGHT
         hw_states_velocity_[i] = linearToAngular(speed->getRightSpeed());
       }
     }
-  } else {
+  }
+  else
+  {
     RCLCPP_ERROR(rclcpp::get_logger(HW_NAME), "Could not get speed data");
   }
 }
@@ -181,9 +197,9 @@ void HuskyHardware::updateJointsFromHardware()
  */
 void HuskyHardware::readStatusFromHardware()
 {
-  auto safety_status =
-    horizon_legacy::Channel<clearpath::DataSafetySystemStatus>::requestData(polling_timeout_);
-  if (safety_status) {
+  auto safety_status = horizon_legacy::Channel<clearpath::DataSafetySystemStatus>::requestData(polling_timeout_);
+  if (safety_status)
+  {
     uint16_t flags = safety_status->getFlags();
     status_msg_.timeout = (flags & SAFETY_TIMEOUT) > 0;
     status_msg_.lockout = (flags & SAFETY_LOCKOUT) > 0;
@@ -191,22 +207,26 @@ void HuskyHardware::readStatusFromHardware()
     status_msg_.ros_pause = (flags & SAFETY_CCI) > 0;
     status_msg_.no_battery = (flags & SAFETY_PSU) > 0;
     status_msg_.current_limit = (flags & SAFETY_CURRENT) > 0;
-  } else {
+  }
+  else
+  {
     RCLCPP_ERROR(rclcpp::get_logger(HW_NAME), "Could not get safety_status");
   }
 
-  auto power_status =
-    horizon_legacy::Channel<clearpath::DataPowerSystem>::requestData(polling_timeout_);
-  if (power_status) {
+  auto power_status = horizon_legacy::Channel<clearpath::DataPowerSystem>::requestData(polling_timeout_);
+  if (power_status)
+  {
     status_msg_.charge_estimate = power_status->getChargeEstimate(0);
     status_msg_.capacity_estimate = power_status->getCapacityEstimate(0);
-  } else {
+  }
+  else
+  {
     RCLCPP_ERROR(rclcpp::get_logger(HW_NAME), "Could not get power_status");
   }
 
-  auto system_status =
-    horizon_legacy::Channel<clearpath::DataSystemStatus>::requestData(polling_timeout_);
-  if (system_status) {
+  auto system_status = horizon_legacy::Channel<clearpath::DataSystemStatus>::requestData(polling_timeout_);
+  if (system_status)
+  {
     status_msg_.uptime = system_status->getUptime();
 
     status_msg_.battery_voltage = system_status->getVoltage(0);
@@ -221,7 +241,9 @@ void HuskyHardware::readStatusFromHardware()
     status_msg_.right_driver_temp = system_status->getTemperature(1);
     status_msg_.left_motor_temp = system_status->getTemperature(2);
     status_msg_.right_motor_temp = system_status->getTemperature(3);
-  } else {
+  }
+  else
+  {
     RCLCPP_ERROR(rclcpp::get_logger(HW_NAME), "Could not get system_status");
   }
   status_msg_.header.stamp = rclcpp::Clock().now();
@@ -236,20 +258,19 @@ void HuskyHardware::readStatusFromHardware()
 /**
  * Determines if the joint is left or right based on the joint name
  */
-uint8_t HuskyHardware::isLeft(const std::string & str)
+uint8_t HuskyHardware::isLeft(const std::string& str)
 {
-  if (str.find("left") != std::string::npos) {
+  if (str.find("left") != std::string::npos)
+  {
     return LEFT;
   }
   return RIGHT;
 }
 
-hardware_interface::CallbackReturn HuskyHardware::on_init(
-  const hardware_interface::HardwareInfo & info)
+hardware_interface::CallbackReturn HuskyHardware::on_init(const hardware_interface::HardwareInfo& info)
 {
-  if (
-    hardware_interface::SystemInterface::on_init(info) !=
-    hardware_interface::CallbackReturn::SUCCESS) {
+  if (hardware_interface::SystemInterface::on_init(info) != hardware_interface::CallbackReturn::SUCCESS)
+  {
     return hardware_interface::CallbackReturn::ERROR;
   }
 
@@ -272,13 +293,10 @@ hardware_interface::CallbackReturn HuskyHardware::on_init(
   status_node_ = std::make_shared<husky_status::HuskyStatus>();
 
   diagnostic_updater_ = std::make_unique<diagnostic_updater::Updater>(status_node_, 10.0);
-  system_status_task_ =
-    std::make_unique<husky_base::HuskyHardwareSystemDiagnosticTask>(status_msg_);
+  system_status_task_ = std::make_unique<husky_base::HuskyHardwareSystemDiagnosticTask>(status_msg_);
   power_status_task_ = std::make_unique<husky_base::HuskyHardwarePowerDiagnosticTask>(status_msg_);
-  safety_status_task_ =
-    std::make_unique<husky_base::HuskyHardwareSafetyDiagnosticTask>(status_msg_);
-  software_status_task_ =
-    std::make_unique<husky_base::HuskySoftwareDiagnosticTask>(status_msg_, 10.0);
+  safety_status_task_ = std::make_unique<husky_base::HuskyHardwareSafetyDiagnosticTask>(status_msg_);
+  software_status_task_ = std::make_unique<husky_base::HuskySoftwareDiagnosticTask>(status_msg_, 10.0);
 
   diagnostic_updater_->setHardwareID("Husky A-200");
   diagnostic_updater_->add(*system_status_task_);
@@ -291,43 +309,41 @@ hardware_interface::CallbackReturn HuskyHardware::on_init(
   horizon_legacy::configureLimits(max_speed_, max_accel_);
   resetTravelOffset();
 
-  for (const hardware_interface::ComponentInfo & joint : info_.joints) {
+  for (const hardware_interface::ComponentInfo& joint : info_.joints)
+  {
     // HuskyHardware has exactly two states and one command interface on each joint
-    if (joint.command_interfaces.size() != 1) {
-      RCLCPP_FATAL(
-        rclcpp::get_logger(HW_NAME), "Joint '%s' has %zu command interfaces found. 1 expected.",
-        joint.name.c_str(), joint.command_interfaces.size());
+    if (joint.command_interfaces.size() != 1)
+    {
+      RCLCPP_FATAL(rclcpp::get_logger(HW_NAME), "Joint '%s' has %zu command interfaces found. 1 expected.",
+                   joint.name.c_str(), joint.command_interfaces.size());
       return hardware_interface::CallbackReturn::ERROR;
     }
 
-    if (joint.command_interfaces[0].name != hardware_interface::HW_IF_VELOCITY) {
-      RCLCPP_FATAL(
-        rclcpp::get_logger(HW_NAME), "Joint '%s' have %s command interfaces found. '%s' expected.",
-        joint.name.c_str(), joint.command_interfaces[0].name.c_str(),
-        hardware_interface::HW_IF_VELOCITY);
+    if (joint.command_interfaces[0].name != hardware_interface::HW_IF_VELOCITY)
+    {
+      RCLCPP_FATAL(rclcpp::get_logger(HW_NAME), "Joint '%s' have %s command interfaces found. '%s' expected.",
+                   joint.name.c_str(), joint.command_interfaces[0].name.c_str(), hardware_interface::HW_IF_VELOCITY);
       return hardware_interface::CallbackReturn::ERROR;
     }
 
-    if (joint.state_interfaces.size() != 2) {
-      RCLCPP_FATAL(
-        rclcpp::get_logger(HW_NAME), "Joint '%s' has %zu state interface. 2 expected.",
-        joint.name.c_str(), joint.state_interfaces.size());
+    if (joint.state_interfaces.size() != 2)
+    {
+      RCLCPP_FATAL(rclcpp::get_logger(HW_NAME), "Joint '%s' has %zu state interface. 2 expected.", joint.name.c_str(),
+                   joint.state_interfaces.size());
       return hardware_interface::CallbackReturn::ERROR;
     }
 
-    if (joint.state_interfaces[0].name != hardware_interface::HW_IF_POSITION) {
-      RCLCPP_FATAL(
-        rclcpp::get_logger(HW_NAME),
-        "Joint '%s' have '%s' as first state interface. '%s' expected.", joint.name.c_str(),
-        joint.state_interfaces[0].name.c_str(), hardware_interface::HW_IF_POSITION);
+    if (joint.state_interfaces[0].name != hardware_interface::HW_IF_POSITION)
+    {
+      RCLCPP_FATAL(rclcpp::get_logger(HW_NAME), "Joint '%s' have '%s' as first state interface. '%s' expected.",
+                   joint.name.c_str(), joint.state_interfaces[0].name.c_str(), hardware_interface::HW_IF_POSITION);
       return hardware_interface::CallbackReturn::ERROR;
     }
 
-    if (joint.state_interfaces[1].name != hardware_interface::HW_IF_VELOCITY) {
-      RCLCPP_FATAL(
-        rclcpp::get_logger(HW_NAME),
-        "Joint '%s' have '%s' as second state interface. '%s' expected.", joint.name.c_str(),
-        joint.state_interfaces[1].name.c_str(), hardware_interface::HW_IF_VELOCITY);
+    if (joint.state_interfaces[1].name != hardware_interface::HW_IF_VELOCITY)
+    {
+      RCLCPP_FATAL(rclcpp::get_logger(HW_NAME), "Joint '%s' have '%s' as second state interface. '%s' expected.",
+                   joint.name.c_str(), joint.state_interfaces[1].name.c_str(), hardware_interface::HW_IF_VELOCITY);
       return hardware_interface::CallbackReturn::ERROR;
     }
   }
@@ -338,11 +354,12 @@ hardware_interface::CallbackReturn HuskyHardware::on_init(
 std::vector<hardware_interface::StateInterface> HuskyHardware::export_state_interfaces()
 {
   std::vector<hardware_interface::StateInterface> state_interfaces;
-  for (auto i = 0u; i < info_.joints.size(); i++) {
+  for (auto i = 0u; i < info_.joints.size(); i++)
+  {
     state_interfaces.emplace_back(hardware_interface::StateInterface(
-      info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_states_position_[i]));
+        info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_states_position_[i]));
     state_interfaces.emplace_back(hardware_interface::StateInterface(
-      info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_states_velocity_[i]));
+        info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_states_velocity_[i]));
   }
 
   return state_interfaces;
@@ -352,16 +369,19 @@ std::vector<hardware_interface::CommandInterface> HuskyHardware::export_command_
 {
   std::vector<hardware_interface::CommandInterface> command_interfaces;
 
-  for (auto i = 0u; i < info_.joints.size(); i++) {
+  for (auto i = 0u; i < info_.joints.size(); i++)
+  {
     command_interfaces.emplace_back(hardware_interface::CommandInterface(
-      info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_commands_[i]));
+        info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_commands_[i]));
 
     // Determine which joints will be used for commands since Husky only has two motors
-    if (info_.joints[i].name == LEFT_CMD_JOINT_NAME) {
+    if (info_.joints[i].name == LEFT_CMD_JOINT_NAME)
+    {
       left_cmd_joint_index_ = i;
     }
 
-    if (info_.joints[i].name == RIGHT_CMD_JOINT_NAME) {
+    if (info_.joints[i].name == RIGHT_CMD_JOINT_NAME)
+    {
       right_cmd_joint_index_ = i;
     }
   }
@@ -369,14 +389,15 @@ std::vector<hardware_interface::CommandInterface> HuskyHardware::export_command_
   return command_interfaces;
 }
 
-hardware_interface::CallbackReturn HuskyHardware::on_activate(
-  const rclcpp_lifecycle::State & /*previous_state*/)
+hardware_interface::CallbackReturn HuskyHardware::on_activate(const rclcpp_lifecycle::State& /*previous_state*/)
 {
   RCLCPP_INFO(rclcpp::get_logger(HW_NAME), "Starting ...please wait...");
 
   // set some default values
-  for (auto i = 0u; i < hw_states_position_.size(); i++) {
-    if (std::isnan(hw_states_position_[i])) {
+  for (auto i = 0u; i < hw_states_position_.size(); i++)
+  {
+    if (std::isnan(hw_states_position_[i]))
+    {
       hw_states_position_[i] = 0;
       hw_states_position_offset_[i] = 0;
       hw_states_velocity_[i] = 0;
@@ -389,8 +410,7 @@ hardware_interface::CallbackReturn HuskyHardware::on_activate(
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
-hardware_interface::CallbackReturn HuskyHardware::on_deactivate(
-  const rclcpp_lifecycle::State & /*previous_state*/)
+hardware_interface::CallbackReturn HuskyHardware::on_deactivate(const rclcpp_lifecycle::State& /*previous_state*/)
 {
   RCLCPP_INFO(rclcpp::get_logger(HW_NAME), "Stopping ...please wait...");
 
@@ -399,8 +419,7 @@ hardware_interface::CallbackReturn HuskyHardware::on_deactivate(
   return hardware_interface::CallbackReturn::SUCCESS;
 }
 
-hardware_interface::return_type HuskyHardware::read(
-  const rclcpp::Time & /*time*/, const rclcpp::Duration & period)
+hardware_interface::return_type HuskyHardware::read(const rclcpp::Time& /*time*/, const rclcpp::Duration& period)
 {
   control_loop_frequency_ = 1.0 / period.seconds();
   RCLCPP_DEBUG(rclcpp::get_logger(HW_NAME), "Reading from hardware");
@@ -411,9 +430,12 @@ hardware_interface::return_type HuskyHardware::read(
 
   // This will run at 10Hz but status data is only needed at 1Hz.
   static int i = 0;
-  if (i <= 10) {
+  if (i <= 10)
+  {
     i++;
-  } else {
+  }
+  else
+  {
     readStatusFromHardware();
     i = 0;
   }
@@ -421,8 +443,7 @@ hardware_interface::return_type HuskyHardware::read(
   return hardware_interface::return_type::OK;
 }
 
-hardware_interface::return_type HuskyHardware::write(
-  const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
+hardware_interface::return_type HuskyHardware::write(const rclcpp::Time& /*time*/, const rclcpp::Duration& /*period*/)
 {
   RCLCPP_DEBUG(rclcpp::get_logger(HW_NAME), "Writing to hardware");
 

@@ -66,8 +66,7 @@ using namespace std;
 namespace clearpath
 {
 
-MessageException::MessageException(const char * msg, enum errors ex_type)
-: Exception(msg), type(ex_type)
+MessageException::MessageException(const char* msg, enum errors ex_type) : Exception(msg), type(ex_type)
 {
 #ifdef LOGGING_AVAIL
   CPR_EXCEPT() << "MessageException " << type << ": " << message << endl << flush;
@@ -80,28 +79,28 @@ Message::Message() : is_sent(false)
   memset(data, 0, MAX_MSG_LENGTH);
 }
 
-Message::Message(void * input, size_t msg_len) : is_sent(false)
+Message::Message(void* input, size_t msg_len) : is_sent(false)
 {
   total_len = msg_len;
   memset(data, 0, MAX_MSG_LENGTH);
   memcpy(data, input, msg_len);
 }
 
-Message::Message(const Message & other) : is_sent(false)
+Message::Message(const Message& other) : is_sent(false)
 {
   total_len = other.total_len;
   memset(data, 0, MAX_MSG_LENGTH);
   memcpy(data, other.data, total_len);
 }
 
-Message::Message(
-  uint16_t type, uint8_t * payload, size_t payload_len, uint32_t timestamp, uint8_t flags,
-  uint8_t version)
-: is_sent(false)
+Message::Message(uint16_t type, uint8_t* payload, size_t payload_len, uint32_t timestamp, uint8_t flags,
+                 uint8_t version)
+  : is_sent(false)
 {
   /* Copy in data */
   total_len = HEADER_LENGTH + payload_len + CRC_LENGTH;
-  if (total_len > MAX_MSG_LENGTH) {
+  if (total_len > MAX_MSG_LENGTH)
+  {
     /* If payload is too long, the only recourse we have in constructor
      * (other than an abort()) is to truncate silently. */
     total_len = MAX_MSG_LENGTH;
@@ -132,14 +131,19 @@ Message::~Message()
 void Message::send()
 {
   // We will retry up to 3 times if we receive CRC errors
-  for (int i = 0; i < 2; ++i) {
-    try {
+  for (int i = 0; i < 2; ++i)
+  {
+    try
+    {
       Transport::instance().send(this);
       return;
-    } catch (BadAckException * ex) {
+    }
+    catch (BadAckException* ex)
+    {
       // Any bad ack other than bad checksum needs to
       // be thrown on
-      if (ex->ack_flag != BadAckException::BAD_CHECKSUM) {
+      if (ex->ack_flag != BadAckException::BAD_CHECKSUM)
+      {
         throw ex;
       }
     }
@@ -159,10 +163,11 @@ void Message::send()
  * @param buf_size  Maximum length of buf
  * @return number of bytes copied.
  */
-size_t Message::getPayload(void * buf, size_t buf_size)
+size_t Message::getPayload(void* buf, size_t buf_size)
 {
   // If we don't have enough space in the buffer, don't even try
-  if (getPayloadLength() > buf_size) {
+  if (getPayloadLength() > buf_size)
+  {
     return 0;
   }
 
@@ -175,26 +180,51 @@ size_t Message::getPayload(void * buf, size_t buf_size)
  * @param offset    The offset from the beginning of the payload.
  * @return a pointer to this Message's internal storage.
  */
-uint8_t * Message::getPayloadPointer(size_t offset) { return data + PAYLOAD_OFST + offset; }
+uint8_t* Message::getPayloadPointer(size_t offset)
+{
+  return data + PAYLOAD_OFST + offset;
+}
 
-uint8_t Message::getLength() { return data[LENGTH_OFST]; }
+uint8_t Message::getLength()
+{
+  return data[LENGTH_OFST];
+}
 
-uint8_t Message::getLengthComp() { return data[LENGTH_COMP_OFST]; }
+uint8_t Message::getLengthComp()
+{
+  return data[LENGTH_COMP_OFST];
+}
 
-uint8_t Message::getVersion() { return data[VERSION_OFST]; }
+uint8_t Message::getVersion()
+{
+  return data[VERSION_OFST];
+}
 
-uint32_t Message::getTimestamp() { return btou(data + TIMESTAMP_OFST, 4); }
+uint32_t Message::getTimestamp()
+{
+  return btou(data + TIMESTAMP_OFST, 4);
+}
 
-uint8_t Message::getFlags() { return data[FLAGS_OFST]; }
+uint8_t Message::getFlags()
+{
+  return data[FLAGS_OFST];
+}
 
-uint16_t Message::getType() { return btou(data + TYPE_OFST, 2); }
+uint16_t Message::getType()
+{
+  return btou(data + TYPE_OFST, 2);
+}
 
-uint16_t Message::getChecksum() { return btou(data + crcOffset(), 2); }
+uint16_t Message::getChecksum()
+{
+  return btou(data + crcOffset(), 2);
+}
 
 void Message::setLength(uint8_t len)
 {
   size_t new_total_len = len + 3;
-  if (new_total_len > MAX_MSG_LENGTH) {
+  if (new_total_len > MAX_MSG_LENGTH)
+  {
     return;
   }
   total_len = new_total_len;
@@ -202,13 +232,25 @@ void Message::setLength(uint8_t len)
   data[LENGTH_COMP_OFST] = ~len;
 }
 
-void Message::setVersion(uint8_t version) { data[VERSION_OFST] = version; }
+void Message::setVersion(uint8_t version)
+{
+  data[VERSION_OFST] = version;
+}
 
-void Message::setTimestamp(uint32_t timestamp) { utob(data + TIMESTAMP_OFST, 4, timestamp); }
+void Message::setTimestamp(uint32_t timestamp)
+{
+  utob(data + TIMESTAMP_OFST, 4, timestamp);
+}
 
-void Message::setFlags(uint8_t flags) { data[FLAGS_OFST] = flags; }
+void Message::setFlags(uint8_t flags)
+{
+  data[FLAGS_OFST] = flags;
+}
 
-void Message::setType(uint16_t type) { utob(data + TYPE_OFST, 2, type); }
+void Message::setType(uint16_t type)
+{
+  utob(data + TYPE_OFST, 2, type);
+}
 
 /**
  * Changes the payload length of the packet.
@@ -218,7 +260,8 @@ void Message::setType(uint16_t type) { utob(data + TYPE_OFST, 2, type); }
  */
 void Message::setPayloadLength(uint8_t len)
 {
-  if (((size_t)(len) + HEADER_LENGTH + CRC_LENGTH) > MAX_MSG_LENGTH) {
+  if (((size_t)(len) + HEADER_LENGTH + CRC_LENGTH) > MAX_MSG_LENGTH)
+  {
     return;
   }
   total_len = len + HEADER_LENGTH + CRC_LENGTH;
@@ -231,13 +274,15 @@ void Message::setPayloadLength(uint8_t len)
  * @param buf       Buffer containing the new payload.
  * @param buf_size  Length of buf.
  */
-void Message::setPayload(void * buf, size_t buf_size)
+void Message::setPayload(void* buf, size_t buf_size)
 {
-  if ((buf_size + HEADER_LENGTH + CRC_LENGTH) > MAX_MSG_LENGTH) {
+  if ((buf_size + HEADER_LENGTH + CRC_LENGTH) > MAX_MSG_LENGTH)
+  {
     return;
   }
   setPayloadLength(buf_size);
-  if (buf_size > getPayloadLength()) {
+  if (buf_size > getPayloadLength())
+  {
     return;
   }
   memcpy(data + PAYLOAD_OFST, buf, buf_size);
@@ -249,10 +294,11 @@ void Message::setPayload(void * buf, size_t buf_size)
  * @param buf_size  The maximum length of buf
  * @return buf on success, NULL on failure
  */
-size_t Message::toBytes(void * buf, size_t buf_size)
+size_t Message::toBytes(void* buf, size_t buf_size)
 {
   // If we don't have enough space in the buffer, don't even try
-  if (total_len > buf_size) {
+  if (total_len > buf_size)
+  {
     return 0;
   }
   memcpy(buf, data, total_len);
@@ -266,39 +312,49 @@ size_t Message::toBytes(void * buf, size_t buf_size)
  * @param strLen    Length of the optional whyNot string
  * @return true if the message is valid, false otherwise.
  */
-bool Message::isValid(char * whyNot, size_t strLen)
+bool Message::isValid(char* whyNot, size_t strLen)
 {
   // Check SOH
-  if (data[SOH_OFST] != SOH) {
-    if (whyNot) {
+  if (data[SOH_OFST] != SOH)
+  {
+    if (whyNot)
+    {
       strncpy(whyNot, "SOH is not present.", strLen);
     }
     return false;
   }
   // Check STX
-  if (data[STX_OFST] != STX) {
-    if (whyNot) {
+  if (data[STX_OFST] != STX)
+  {
+    if (whyNot)
+    {
       strncpy(whyNot, "STX is not present.", strLen);
     }
     return false;
   }
   // Check length matches complement
-  if (getLength() != ((~getLengthComp()) & 0xff)) {
-    if (whyNot) {
+  if (getLength() != ((~getLengthComp()) & 0xff))
+  {
+    if (whyNot)
+    {
       strncpy(whyNot, "Length does not match complement.", strLen);
     }
     return false;
   }
   // Check length is correct
-  if (getLength() != (total_len - 3)) {
-    if (whyNot) {
+  if (getLength() != (total_len - 3))
+  {
+    if (whyNot)
+    {
       strncpy(whyNot, "Length is wrong.", strLen);
     }
     return false;
   }
   // Check the CRC
-  if (crc16(crcOffset(), CRC_INIT_VAL, this->data) != getChecksum()) {
-    if (whyNot) {
+  if (crc16(crcOffset(), CRC_INIT_VAL, this->data) != getChecksum())
+  {
+    if (whyNot)
+    {
       strncpy(whyNot, "CRC is wrong.", strLen);
     }
     return false;
@@ -319,7 +375,7 @@ void Message::makeValid()
   utob(data + crcOffset(), 2, checksum);
 }
 
-std::ostream & Message::printMessage(std::ostream & stream)
+std::ostream& Message::printMessage(std::ostream& stream)
 {
   stream << "Message" << endl;
   stream << "=======" << endl;
@@ -336,10 +392,11 @@ std::ostream & Message::printMessage(std::ostream & stream)
   return stream;
 }
 
-void Message::printRaw(std::ostream & stream)
+void Message::printRaw(std::ostream& stream)
 {
   stream << hex << uppercase;
-  for (unsigned int i = 0; i < total_len; i++) {
+  for (unsigned int i = 0; i < total_len; i++)
+  {
     stream << static_cast<short>(data[i]) << " ";
   }
   stream << dec;
@@ -353,11 +410,12 @@ void Message::printRaw(std::ostream & stream)
  * @param msg_len   The length of input.
  * @return  An instance of the correct Message subclass
  */
-Message * Message::factory(void * input, size_t msg_len)
+Message* Message::factory(void* input, size_t msg_len)
 {
-  uint16_t type = btou((char *)input + TYPE_OFST, 2);
+  uint16_t type = btou((char*)input + TYPE_OFST, 2);
 
-  switch (type) {
+  switch (type)
+  {
     case DATA_ACCEL:
       return new DataPlatformAcceleration(input, msg_len);
 
@@ -453,13 +511,19 @@ Message * Message::factory(void * input, size_t msg_len)
   }  // switch getType()
 }  // factory()
 
-Message * Message::popNext() { return Transport::instance().popNext(); }
+Message* Message::popNext()
+{
+  return Transport::instance().popNext();
+}
 
-Message * Message::waitNext(double timeout) { return Transport::instance().waitNext(timeout); }
+Message* Message::waitNext(double timeout)
+{
+  return Transport::instance().waitNext(timeout);
+}
 
 }  // namespace clearpath
 
-std::ostream & operator<<(std::ostream & stream, clearpath::Message & msg)
+std::ostream& operator<<(std::ostream& stream, clearpath::Message& msg)
 {
   return msg.printMessage(stream);
 }
