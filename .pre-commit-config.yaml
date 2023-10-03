@@ -17,7 +17,9 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.4.0
     hooks:
-      - id: check-added-large-files
+      - exclude: husky_description/meshes/accessories/d435.dae
+        # id: check-added-large-files
+        id: check-added-large-files
       - id: check-case-conflict
       - id: check-merge-conflict
       - id: check-symlinks
