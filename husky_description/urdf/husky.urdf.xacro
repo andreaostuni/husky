@@ -49,6 +49,48 @@
       </sensor>
     </gazebo>
 
+    <gazebo>
+      <plugin name="gazebo_ros_p3d" filename="libgazebo_ros_p3d.so">
+        <ros>
+          <namespace>$(arg prefix)</namespace>
+          <remapping>odom:=ground_truth</remapping>
+        </ros>
+        <body_name>base_link</body_name>
+        <update_rate>10</update_rate>
+      </plugin>
+    </gazebo>
+
+    <xacro:if value="$(arg husky_wheel_slip)">
+      <gazebo>
+        <plugin filename="libgazebo_ros_wheel_slip.so" name="wheels_slip">
+          <wheel link_name="front_left_wheel">
+            <slip_compliance_lateral>1.0</slip_compliance_lateral>
+            <slip_compliance_longitudinal>1.0</slip_compliance_longitudinal>
+            <wheel_normal_force>113</wheel_normal_force>
+            <wheel_radius>0.1651</wheel_radius>
+          </wheel>
+          <wheel link_name="front_right_wheel">
+            <slip_compliance_lateral>1.0</slip_compliance_lateral>
+            <slip_compliance_longitudinal>1.0</slip_compliance_longitudinal>
+            <wheel_normal_force>113</wheel_normal_force>
+            <wheel_radius>0.1651</wheel_radius>
+          </wheel>
+          <wheel link_name="rear_left_wheel">
+            <slip_compliance_lateral>1.0</slip_compliance_lateral>
+            <slip_compliance_longitudinal>1.0</slip_compliance_longitudinal>
+            <wheel_normal_force>113</wheel_normal_force>
+            <wheel_radius>0.1651</wheel_radius>
+          </wheel>
+          <wheel link_name="rear_right_wheel">
+            <slip_compliance_lateral>1.0</slip_compliance_lateral>
+            <slip_compliance_longitudinal>1.0</slip_compliance_longitudinal>
+            <wheel_normal_force>113</wheel_normal_force>
+            <wheel_radius>0.1651</wheel_radius>
+          </wheel>
+        </plugin>
+      </gazebo>
+    </xacro:if>
+
   </xacro:if>
 
   <!-- Optional custom includes. -->

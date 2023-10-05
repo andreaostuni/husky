@@ -11,6 +11,8 @@
   <xacro:arg name="realsense_rpy" default="$(optenv CPR_REALSENSE_RPY 0 0 0)" />
   <xacro:arg name="realsense_mount" default="$(optenv CPR_REALSENSE_MOUNT_FRAME top_plate_front_link)" />
 
+  <xacro:arg name="husky_wheel_slip" default="$(optenv HUSKY_WHEEL_SLIP 0)" />
+
   <xacro:property name="husky_front_bumper_extend" value="$(optenv HUSKY_FRONT_BUMPER_EXTEND 0)" />
   <xacro:property name="husky_rear_bumper_extend" value="$(optenv HUSKY_REAR_BUMPER_EXTEND 0)" />
 
@@ -40,7 +42,7 @@
 
     <!-- Wheel Mounting Positions -->
     <xacro:property name="wheelbase" value="0.5120" />
-    <xacro:property name="track" value="0.5708" />
+    <xacro:property name="track" value="0.555" />
     <xacro:property name="wheel_vertical_offset" value="0.03282" />
 
     <!-- Wheel Properties -->
