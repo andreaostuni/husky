@@ -20,7 +20,8 @@ from launch.actions import (
     RegisterEventHandler,
     SetEnvironmentVariable,
 )
-from launch.event_handlers import OnProcessExit
+from launch.event_handlers import OnProcessExit, OnProcessIO
+from launch.actions import TimerAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import (
     Command,
@@ -107,6 +108,23 @@ def generate_launch_description():
         output="screen",
     )
 
+    # Spawn robot
+    spawn_robot = Node(
+        package="gazebo_ros",
+        executable="spawn_entity.py",
+        name="spawn_husky",
+        arguments=["-entity", "husky", "-topic", "robot_description"],
+        output="screen",
+    )
+
+    # Make sure spawn_joint_state_broadcaster starts after spawn_robot
+    joint_state_spawn_callback = RegisterEventHandler(
+        OnProcessExit(
+            target_action=spawn_robot,
+            on_exit=[spawn_joint_state_broadcaster],
+        )
+    )
+
     # Make sure spawn_husky_velocity_controller starts after spawn_joint_state_broadcaster
     diffdrive_controller_spawn_callback = RegisterEventHandler(
         event_handler=OnProcessExit(
@@ -134,15 +152,6 @@ def generate_launch_description():
         # condition=IfCondition(LaunchConfiguration('gui')),
     )
 
-    # Spawn robot
-    spawn_robot = Node(
-        package="gazebo_ros",
-        executable="spawn_entity.py",
-        name="spawn_husky",
-        arguments=["-entity", "husky", "-topic", "robot_description"],
-        output="screen",
-    )
-
     # Launch husky_control/control.launch.py which is just robot_localization.
     launch_husky_control = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -165,7 +174,7 @@ def generate_launch_description():
     ld = LaunchDescription(ARGUMENTS)
     ld.add_action(gz_resource_path)
     ld.add_action(node_robot_state_publisher)
-    ld.add_action(spawn_joint_state_broadcaster)
+    ld.add_action(joint_state_spawn_callback)
     ld.add_action(diffdrive_controller_spawn_callback)
     ld.add_action(gzserver)
     ld.add_action(gzclient)
