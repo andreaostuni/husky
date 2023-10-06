@@ -15,7 +15,7 @@
           <mesh filename="package://husky_description/meshes/wheel.dae" />
         </geometry>
       </visual>
-      <collision>
+      <collision name="${wheel_prefix}_wheel_c">
         <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
         <geometry>
           <cylinder length="${wheel_length}" radius="${wheel_radius}" />

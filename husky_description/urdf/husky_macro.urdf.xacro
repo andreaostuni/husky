@@ -89,6 +89,21 @@
       </inertial>
     </link>
 
+    <link name="${prefix}collision_link">
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="${base_x_size+ 0.04} ${track + wheel_length + 0.04} ${base_z_size/2}"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <joint name="${prefix}collision_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <parent link="${prefix}base_link" />
+      <child link="${prefix}collision_link" />
+    </joint>
+
     <joint name="${prefix}inertial_joint" type="fixed">
       <origin xyz="0 0 0" rpy="0 0 0" />
       <parent link="${prefix}base_link" />

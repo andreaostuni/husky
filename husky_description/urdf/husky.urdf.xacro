@@ -60,6 +60,23 @@
       </plugin>
     </gazebo>
 
+    <gazebo reference="collision_link">
+      <sensor name='collision_sensor' type='contact'>
+        <update_rate>10</update_rate>
+        <contact>
+          <!-- <collision>base_link_collision</collision> -->
+          <collision>base_link_fixed_joint_lump__collision_link_collision_2</collision>
+        </contact>
+        <plugin name="collision_sensor" filename="libgazebo_ros_collision.so">
+          <ros>
+            <namespace>husky</namespace>
+          </ros>
+          <frame_name>collision_link</frame_name>
+          <terrain_name>terrain2</terrain_name>
+        </plugin>
+      </sensor>
+    </gazebo>
+
     <xacro:if value="$(arg husky_wheel_slip)">
       <gazebo>
         <plugin filename="libgazebo_ros_wheel_slip.so" name="wheels_slip">

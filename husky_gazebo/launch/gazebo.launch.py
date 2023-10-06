@@ -20,8 +20,7 @@ from launch.actions import (
     RegisterEventHandler,
     SetEnvironmentVariable,
 )
-from launch.event_handlers import OnProcessExit, OnProcessIO
-from launch.actions import TimerAction
+from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import (
     Command,
@@ -140,6 +139,7 @@ def generate_launch_description():
             "libgazebo_ros_init.so",
             "-s",
             "libgazebo_ros_factory.so",
+            "--verbose",
             world_path,
         ],
         output="screen",
